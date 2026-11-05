@@ -1,5 +1,7 @@
 # Implementacija koncepata interakcije s korisnikom u iOS aplikacijama
 
+Ovaj tutorijal uključuje teorijske i praktične aspekte interakcije aplikacije i korisnika, odnosno prikazuje kako iOS aplikacija može slati poruke korisniku i kako korisnik može reagirati na njih. Svaki koncept je prvo teorijski objašnjen s preporukama za dizajn, a zatim implementiran u SwiftUI-ju.
+
 ## Sadržaj
 1. [Uvod](#uvod)
 2. [Početni projekt](#korak-1-početni-projekt)
@@ -13,7 +15,29 @@
 10. [Literatura](#literatura)
 
 ## Uvod
-...
+
+Aplikacija stalno komunicira s korisnikom na različite načine:
+- potvrđuje da je neka uspjela
+- potvrđuje da nije uspjela odnosno javlja grešku
+- traži potvrdu za brisanje podataka
+- traži potvrdu za nastavak dalje u nekom koraku...
+
+Važno je ispravno implementirati koncepte interakcije tako da manje važne poruke ne prekidaju rad korisnika te tako negativno utječu na korisničko iskustvo, a s druge strane osigurati da važne poruke ne prođu neprimijećeno.
+
+Poruke korisniku možemo podijeliti u dvije skupine:
+
+**Poruke unutar aplikacije** prikazuju se dok korisnik koristi aplikaciju:
+- **Dijalozi**: prekidaju rad i traže odgovor korisnika
+  (npr. potvrda brisanja).
+- **Toast**: nemodalna poruka koja sama nestaje
+  (npr. „Spremljeno“).
+- **Snackbar**: sličan toastu, ali nudi i jednu akciju
+  (npr. „Poruka obrisana – Poništi“).
+- **FAB** (Floating Action Button) je istaknuti gumb za glavnu
+  radnju na ekranu.
+
+**Sistemske notifikacije**: prikazuje operacijski sustav, pa stižu i kad aplikacija nije otvorena. U ovom tutorijalu obrađujemo lokalne notifikacije u dvije verzije: jednostavnu i složenu (o tome više riječi u koraku #5)
+
 
 ## Početni projekt
 ...
