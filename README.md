@@ -1,14 +1,14 @@
 # Implementacija koncepata interakcije s korisnikom u iOS aplikacijama
 
-Ovaj tutorijal uključuje teorijske i praktične aspekte interakcije aplikacije i korisnika, odnosno prikazuje kako iOS aplikacija može slati poruke korisniku i kako korisnik može reagirati na njih. Svaki koncept je prvo teorijski objašnjen s preporukama za dizajn, a zatim implementiran u SwiftUI-ju.
+Ovaj tutorial uključuje teorijske i praktične aspekte interakcije aplikacije i korisnika, odnosno prikazuje kako iOS aplikacija može slati poruke korisniku i kako korisnik može reagirati na njih. Svaki koncept je prvo teorijski objašnjen s preporukama za dizajn, a zatim implementiran u SwiftUI-ju.
 
 ## Sadržaj
 1. [Uvod](#uvod)
-2. [Početni projekt](#korak-1-početni-projekt)
+2. [Početni projekt](#početni-projekt)
 3. [Početna navigacija](#početna-navigacija)
 4. [Korak 1: Dijalozi](#korak-1-dijalozi)
 5. [Korak 2: Toast](#korak-2-toast)
-6. [Korak 3: Snackabr](#korak-3-snackbar)
+6. [Korak 3: Snackbar](#korak-3-snackbar)
 7. [Korak 4: FAB](#korak-4-fab)
 8. [Korak 5: Sistemske notifikacije](#korak-5-sistemske-notifikacije)
 9. [Zaključak](#zaključak)
@@ -40,7 +40,26 @@ Poruke korisniku možemo podijeliti u dvije skupine:
 
 
 ## Početni projekt
-...
+
+Kako bi mogli pratiti tutorial, potrebno je kreirati novi projekt:
+1. Otvori Xcode i odaberi **File -> New -> Project...**
+2. Pod **iOS** odaberi predložak **App** i klikni **Next**.
+3. Ispuni sljedeće postavke projekta:
+
+| Postavka | Vrijednost | Objašnjenje |
+|---|---|---|
+| Product Name | UserInteractionDemo (može biti proizvoljno) | ime aplikacije i projekta |
+| Interface | SwiftUI | framework za izradu sučelja |
+| Language | Swift | |
+| Storage | None | aplikacija ne sprema podatke |
+
+4. Odaberi mapu u kojoj će se projekt spremiti i klikni **Create**
+
+### Početna struktura projeta
+![Struktura projekta](images/struktura-projekta.png)
+
+
+
 
 ## Početna navigacija
 ...
