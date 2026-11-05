@@ -38,6 +38,14 @@ Poruke korisniku možemo podijeliti u dvije skupine:
 
 **Sistemske notifikacije**: prikazuje operacijski sustav, pa stižu i kad aplikacija nije otvorena. U ovom tutorijalu obrađujemo lokalne notifikacije u dvije verzije: jednostavnu i složenu (o tome više riječi u koraku #5)
 
+Toast, snackbar i FAB potječu iz Androida i Material Designa
+te nemaju gotovu komponentu u iOS-u. U tutorialu ih zato
+implementiramo kao vlastite komponente, uz preporuke iz
+Apple Human Interface Guidelines i Material Designa.
+
+Detaljnija objašnjenja slijede u daljnjim koracima tutorijala.
+
+_**Napomena:** Tutorijal se usredotočuje na interakciju aplikacija s korisnikom. osnove jezika Swift i osnove SwiftUI-ja neće se detaljno objašnjavati jer nisu dio ove teme te se pretpostavlja da ih čitatelj već razumije. Objašnjavaju se samo dijelovi koji su izravno vezani uz temu._
 
 ## Početni projekt
 
@@ -56,8 +64,29 @@ Kako bi mogli pratiti tutorial, potrebno je kreirati novi projekt:
 4. Odaberi mapu u kojoj će se projekt spremiti i klikni **Create**
 
 ### Početna struktura projeta
+
+```text
+interakcija_s_korisnikom/
+├── README.md
+├── .gitignore
+└── UserInterfaceDemo/
+    ├── UserInterfaceDemo.xcodeproj
+    └── UserInterfaceDemo/
+        ├── UserInterfaceDemoApp.swift
+        ├── ContentView.swift
+        ├── Assets.xcassets/
+        └── Preview Content/
+            └── Preview Assets.xcassets
+```
+
 ![Struktura projekta](images/struktura-projekta.png)
 
+#### ContentView.swift
+
+
+#### UserInterfaceDemoApp
+
+Dakle trebali bi imati ovakvu strukturu, izgled prvog ekrana i programski kod navedenih datoteka prije nego se krene sa samim objašnjavanjem teme ovog tutorijala.
 
 
 
