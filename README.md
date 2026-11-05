@@ -82,9 +82,39 @@ interakcija_s_korisnikom/
 ![Struktura projekta](images/struktura-projekta.png)
 
 #### ContentView.swift
+```swift
+import SwiftUI
 
+struct ContentView: View {
+    var body: some View {
+        VStack {
+            Image(systemName: "globe")
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+            Text("Hello, world!")
+        }
+        .padding()
+    }
+}
+#Preview {
+    ContentView()
+}
 
-#### UserInterfaceDemoApp
+```
+
+#### UserInterfaceDemoApp.swift
+```swift
+import SwiftUI
+
+@main
+struct UserInterfaceDemoApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+```
 
 Dakle trebali bi imati ovakvu strukturu, izgled prvog ekrana i programski kod navedenih datoteka prije nego se krene sa samim objašnjavanjem teme ovog tutorijala.
 
