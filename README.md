@@ -274,7 +274,334 @@ Sad kada smo pripremili početnu aplikaciju, možemo krenuti s primjerima.
 [↑ Natrag na sadržaj](#sadržaj)
 
 ## Korak 1: Dijalozi
-...
+
+Dijalog je **modalni** element sučelja koji se prikazuje iznad trenutnog sadržaja i prekida korisnika dok ne odgovori ili ga ne zatvori. Stoga može biti vrlo koristan, ali i nametljiv. Koristi se kada aplikacija treba korisniku reći nešto važno ili od njega tražiti odluku prije nego nastavi.
+
+U iOS-u postoje tri osnovna oblika dijaloga: 
+| Vrsta | Izgled | Kada se koristi | SwiftUi |
+|---|---|---|---|
+| **Alert** | mali okvir u sredini ekrana | važna informacija ili potvrda radnje | _.action_|
+| **Action sheet** (**Donfirmation Dialog**) | izbornik koji izlazi s dna ekrana | izbor između više radnji vezanih uz radnju koju je korisnik pokrenuo | _.confirmationDialog_ |
+| **Sheet** | ploča preko dijela ili cijelog ekrana | kratak, zaokružen zadatak vezan uz trenutni kontekst (npr. obrazac) | _.sheet_ |
+
+### Preporuke dizajna
+
+Preporuke su preuzete iz Apple Human Interface Guidelines.
+_(Poveznica u sekciji [Literatura](#sadržaj) )_
+
+**Alert**
+- Koristi ga štedljivo. Alert prekida korisnika, pa svaki treba sadržavati
+  samo bitne informacije i korisne radnje. Ako se alerti pojavljuju
+  prečesto, korisnici ih počnu zatvarati bez čitanja.
+- Ne prikazuj alert za česte radnje koje se mogu poništiti, čak ni kad
+  su destruktivne. Primjer: brisanje e-maila ne traži potvrdu jer se
+  može vratiti iz smeća.
+- Alert ima naslov, neobavezni tekst poruke i najviše tri gumba.
+  Na iOS-u može sadržavati i polje za unos teksta.
+- Nazivi gumba trebaju biti kratki (jedna ili dvije riječi) i opisivati
+  rezultat: „Obriši“ je bolje od „Da“.
+- Ako korisnik bira između više od dva izbora, bolje je koristiti
+  action sheet.
+
+**Action Sheet** (**Confirmation Dialog**)
+- Koristi ga za izbore vezane uz radnju koju je korisnik sam pokrenuo.
+  Primjer: kad korisnik zatvara nedovršenu poruku, nudi se „Spremi skicu“
+  ili „Obriši skicu“.
+- Gumb za odustajanje nalazi se na dnu. U SwiftUI-ju ga confirmation
+  dialog dodaje automatski.
+- Uz gumb za odustajanje ponudi najviše tri dodatna izbora.
+
+**Sheet**
+- Koristi ga za kratak zadatak usko vezan uz trenutni kontekst,
+  npr. unos komentara ili uređivanje jednog podatka.
+- Sheet treba imati gumb za odustajanje koji ga zatvara bez spremanja
+  promjena.
+
+**Uloge gumba**
+
+SwiftUI gumbima može dodijeliti ulogu (_role_):
+- _.destructive_ – gumb briše podatke ili izvodi nepovratnu radnju;
+  sustav ga prikazuje crveno
+- _.cancel_ – gumb zatvara dijalog bez ikakve radnje; sustav ga sam
+  postavlja na uobičajeno mjesto
+
+Zahvaljujući ulogama, dijalozi automatski prate sistemski izgled
+i ponašanje, a korisnik odmah prepoznaje opasnu radnju.
+
+### Korak 1.1: Priprema ekrana
+
+ 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/ecf5f0)
+
+Ekran _DialogsScreen_ prikazuje listu gumba, a svaki otvara jedan primjer dijaloga. Na dnu se prikazuje zadnja reakcija korisnika, kako bi se vidjelo koji je gumb u dijalogu odabran.
+
+Dakle pripremi DialogsScreen.swift kako je prikazano ispod:
+```swift
+import SwiftUI
+
+struct DialogsScreen: View {
+    // varijable stanja idu ovdje
+    @State private var lastAction = "Još nije odabrana nijedna radnja."
+
+    var body: some View {
+        List {
+            // gumbi na ekranu idu ovdje
+            Section("Zadnja reakcija korisnika") {
+                Text(lastAction)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .navigationTitle("Dijalozi")
+        // dijalozi idu ovdje
+    }
+}
+```
+Svaki dijalog u SwiftUI-ju prikazuje se na isti način:
+1. varijabla stanja tipa _Bool_ određuje je li dijalog vidljiv
+2. gumb na ekranu postavlja tu varijablu na _true_
+3. modifikator dijaloga (_.alert_, _.confirmationDialog_, _.sheet_)
+   prima tu varijablu kao **binding** (_$_) i prikazuje dijalog
+4. kad korisnik odabere gumb u dijalogu, SwiftUI sam vraća varijablu
+   na _false_ i zatvara dijalog
+
+U sljedeća tri koraka su objašnjena tri tipa Alerta.
+
+### Korak 1.2: Informativni alert
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/48b9d4d)
+
+Najjednostavniji alert koji obavještava korisnika o važnom događaju
+i ima samo jedan gumb.
+
+Dodaj varijablu stanja:
+```swift
+@State private var showInfoAlert = false
+```
+
+Dodaj sekciju s gumbom na vrh liste:
+```swift
+Section("Alert") {
+    Button("Informativni alert") {
+        showInfoAlert = true
+    }
+}
+```
+
+Dodaj modifikator nakon _.navigationTitle_:
+```swift
+.alert("Nema internetske veze", isPresented: $showInfoAlert) {
+    Button("U redu") {
+        lastAction = "Korisnik je potvrdio informativni alert."
+    }
+} message: {
+    Text("Provjerite vezu i pokušajte ponovno.")
+}
+```
+- Prvi parametar je **naslov** alerta.
+- _isPresented: $showInfoAlert_ povezuje alert s varijablom stanja.
+- U prvom bloku su **gumbi**, a u bloku _message_ **tekst poruke**.
+
+Primjer prati preporuku da alert sadrži važnu informaciju, dakle korisnik
+mora znati da nema internetske veze jer o tome ovisi što može dalje raditi.
+
+Kako bi testirali implementirani kod, navigiramo se s početnog ekrana u sekciju _Dijalozi_ nakon čega odaberemo opciju _Informativni alert_ što nam prikaže sami alert na kojemu odaberemo opciju _U redu_. Možemo primijetiti kako se u _Zadnju reakciju korisnika_ upiše _Korisnik je potvrdio informativni alert_
+
+<img src="images/alert-informativni.png" alt="Alert informativni" width="400">
+
+### 1.3 Alert za potvrdu destruktivne radnje
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/cfce10c)
+
+Kada radnja nepovratno briše podatke, alert traži potvrdu korisnika.
+
+```swift
+@State private var showDeleteAlert = false
+```
+
+```swift
+Button("Potvrda brisanja") {
+    showDeleteAlert = true
+}
+```
+
+```swift
+.alert("Obrisati fotografiju?", isPresented: $showDeleteAlert) {
+    Button("Obriši", role: .destructive) {
+        lastAction = "Korisnik je obrisao fotografiju."
+    }
+    Button("Odustani", role: .cancel) {
+        lastAction = "Korisnik je odustao od brisanja."
+    }
+} message: {
+    Text("Ova radnja se ne može poništiti.")
+}
+```
+
+- _role: .destructive_ prikazuje gumb crveno i upozorava korisnika.
+- _role: .cancel_ označava gumb za odustajanje. Sustav ga sam postavlja
+  na uobičajeno mjesto, bez obzira na redoslijed u kodu.
+- Gumbi su nazvani prema rezultatu („Obriši“, „Odustani“), a ne
+  „Da“ i „Ne“.
+- Poruka objašnjava posljedicu, što je razlog za prikaz alerta:
+  radnja se ne može poništiti.
+
+<img src="images/alert-brisanje.png" alt="Alert za potvrdu brisanja" width="400">
+
+### 1.4 Alert s unosom teksta
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/906ee3a)
+
+Na iOS-u alert može sadržavati polje za unos teksta, što je korisno
+za kratak unos poput novog naziva.
+
+```swift
+@State private var showRenameAlert = false
+@State private var newName = ""
+```
+
+```swift
+Button("Alert s unosom teksta") {
+    newName = ""
+    showRenameAlert = true
+}
+```
+
+```swift
+.alert("Preimenuj album", isPresented: $showRenameAlert) {
+    TextField("Novi naziv", text: $newName)
+    Button("Spremi") {
+        lastAction = "Novi naziv albuma: \(newName)"
+    }
+    Button("Odustani", role: .cancel) {
+        lastAction = "Korisnik je odustao od preimenovanja."
+    }
+} message: {
+    Text("Unesite novi naziv albuma.")
+}
+```
+
+- _TextField_ unutar bloka gumba prikazuje polje za unos u alertu.
+- Tekst se sprema u varijablu _newName_ preko bindinga _$newName_.
+- Prije otvaranja alerta polje se prazni, kako ne bi ostao tekst
+  od prošlog unosa.
+
+
+<img src="images/alert-unos.png" alt="Alert s unosom" width="400">
+
+### 1.5 Confirmation dialog (action sheet)
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/e014252)
+
+Kada korisnik pokrene radnju koja ima više mogućih ishoda, koristi se
+confirmation dialog, koji se na iPhoneu prikazuje kao action sheet
+s dna ekrana.
+
+```swift
+@State private var showDraftDialog = false
+```
+
+```swift
+Section("Confirmation dialog") {
+    Button("Zatvori skicu poruke") {
+        showDraftDialog = true
+    }
+}
+```
+
+```swift
+.confirmationDialog(
+    "Što želite napraviti sa skicom?",
+    isPresented: $showDraftDialog,
+    titleVisibility: .visible
+) {
+    Button("Spremi skicu") {
+        lastAction = "Skica je spremljena."
+    }
+    Button("Obriši skicu", role: .destructive) {
+        lastAction = "Skica je obrisana."
+    }
+    Button("Odustani", role: .cancel) {
+        lastAction = "Korisnik je nastavio uređivati poruku."
+    }
+} message: {
+    Text("Poruka još nije poslana.")
+}
+```
+- Naslov se na iPhoneu po defaultu ne prikazuje, pa ga
+  _titleVisibility: .visible_ uključuje.
+- Gumb s ulogom _.cancel_ prikazuje se odvojeno na dnu. Kad bi se
+  izostavio, SwiftUI bi ga dodao automatski.
+- Primjer ima dva izbora uz odustajanje, što je unutar preporučenog
+  broja izbora.
+
+<img src="images/confirmation-dialog.png" alt="Confirmation dialog" width="400">
+
+### 1.6 Sheet
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/a53d6a6)
+
+Sheet se koristi kada dijalog sadrži više od par gumba, npr. obrazac.
+
+```swift
+@State private var showSheet = false
+@State private var comment = ""
+```
+
+```swift
+Section("Sheet") {
+    Button("Pošalji povratnu informaciju") {
+        comment = ""
+        showSheet = true
+    }
+}
+```
+
+```swift
+.sheet(isPresented: $showSheet) {
+    NavigationStack {
+        Form {
+            TextField("Vaš komentar", text: $comment, axis: .vertical)
+        }
+        .navigationTitle("Povratna informacija")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Odustani") {
+                    lastAction = "Korisnik je odustao od slanja komentara."
+                    showSheet = false
+                }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Pošalji") {
+                    lastAction = "Poslan komentar: \(comment)"
+                    showSheet = false
+                }
+                .disabled(comment.isEmpty)
+            }
+        }
+    }
+    .presentationDetents([.medium])
+}
+```
+
+- Sadržaj sheeta je običan SwiftUI view, pa može sadržavati bilo što.
+- Za razliku od alerta, sheet se ne zatvara sam, nego ga zatvara
+  postavljanje _showSheet = false_.
+- _.cancellationAction_ i _.confirmationAction_ postavljaju gumbe na
+  uobičajena mjesta u navigacijskoj traci (lijevo odustajanje,
+  desno potvrda).
+- _.disabled(comment.isEmpty)_ onemogućuje slanje praznog komentara.
+- _.presentationDetents([.medium])_ prikazuje sheet preko pola ekrana,
+  tako da korisnik i dalje vidi kontekst ispod njega.
+
+<img src="images/sheet.png" alt="Sheet" width="400">
+
+### Završni izgled ekrana
+
+| Ekran s primjerima | Alert | Confirmation dialog | Sheet |
+|---|---|---|---|
+| ![](images/dijalozi-ekran.png) | ![](images/alert-brisanje.png) | ![](images/confirmation-dialog.png) | ![](images/sheet.png) |
+
+[↑ Natrag na sadržaj](#sadržaj)
 
 ## Korak 2: Toast
 ...
