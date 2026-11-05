@@ -7,7 +7,7 @@ struct DialogsScreen: View {
     @State private var showDeleteAlert = false
     @State private var showRenameAlert = false
     @State private var newName = ""
-    
+    @State private var showActionSheet = false
     var body: some View {
         List{
             // gumbi
@@ -21,6 +21,11 @@ struct DialogsScreen: View {
                 Button("Alert s unosom teksta"){
                     newName = ""
                     showRenameAlert = true
+                }
+            }
+            Section("Confirmation dialog (action sheet)"){
+                Button("Zatvori skicu poruke"){
+                    showActionSheet = true
                 }
             }
             Section("Zadnja reakcija korisnika"){
@@ -56,6 +61,19 @@ struct DialogsScreen: View {
             }
         }message:{
             Text("Unesite novi naziv albuma.")
+        }
+        .confirmationDialog("Što želite napraviti sa skicom?", isPresented: $showActionSheet, titleVisibility: .visible){
+            Button("Spremi skicu"){
+                lastAction = "Skica je spremljena"
+            }
+            Button("Obriši skicu", role: .destructive){
+                lastAction = "Skica je obrisana"
+            }
+            Button("Odustani", role: .cancel){
+                lastAction = "Korisnik je nastavio uređivati poruku"
+            }
+        }message:{
+            Text("Poruka još nije poslana")
         }
     }
 }
