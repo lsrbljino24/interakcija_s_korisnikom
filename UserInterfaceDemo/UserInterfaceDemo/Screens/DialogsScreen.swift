@@ -5,7 +5,8 @@ struct DialogsScreen: View {
     @State private var lastAction = "Još nije odabrana nijedna radnja"
     @State private var showInfoAlert = false
     @State private var showDeleteAlert = false
-    
+    @State private var showRenameAlert = false
+    @State private var newName = ""
     
     var body: some View {
         List{
@@ -16,6 +17,10 @@ struct DialogsScreen: View {
                 }
                 Button("Potvrda brisanja"){
                     showDeleteAlert = true
+                }
+                Button("Alert s unosom teksta"){
+                    newName = ""
+                    showRenameAlert = true
                 }
             }
             Section("Zadnja reakcija korisnika"){
@@ -40,6 +45,17 @@ struct DialogsScreen: View {
             }
         }message:{
             Text("Ova radnja se ne može poništiti")
+        }
+        .alert("Preimenuj album", isPresented: $showRenameAlert){
+            TextField("Novi naziv", text: $newName)
+            Button("Spremi"){
+                lastAction = "Novi naziv albuma: \(newName)"
+            }
+            Button("Odustani", role: .cancel){
+                lastAction = "Korisik je odustao od preimenovanja"
+            }
+        }message:{
+            Text("Unesite novi naziv albuma.")
         }
     }
 }
