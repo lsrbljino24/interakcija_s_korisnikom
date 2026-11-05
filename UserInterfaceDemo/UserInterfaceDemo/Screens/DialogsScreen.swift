@@ -8,6 +8,9 @@ struct DialogsScreen: View {
     @State private var showRenameAlert = false
     @State private var newName = ""
     @State private var showActionSheet = false
+    @State private var showSheet = false
+    @State private var comment = ""
+    
     var body: some View {
         List{
             // gumbi
@@ -26,6 +29,12 @@ struct DialogsScreen: View {
             Section("Confirmation dialog (action sheet)"){
                 Button("Zatvori skicu poruke"){
                     showActionSheet = true
+                }
+            }
+            Section("Sheet"){
+                Button("Pošalji povratnu informaciju"){
+                    comment = ""
+                    showSheet = true
                 }
             }
             Section("Zadnja reakcija korisnika"){
@@ -74,6 +83,31 @@ struct DialogsScreen: View {
             }
         }message:{
             Text("Poruka još nije poslana")
+        }
+        .sheet(isPresented: $showSheet){
+            NavigationStack{
+                Form{
+                    TextField("Vaš komentar", text: $comment, axis: .vertical)
+                }
+                .navigationTitle("Povratna informacija")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar{
+                    ToolbarItem(placement: .cancellationAction){
+                        Button("Odustani"){
+                            lastAction = "Korisnik je odustao od slanja komentara"
+                            showSheet = false
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction){
+                        Button("Posalji"){
+                            lastAction = "Poslan komentar: \(comment)"
+                            showSheet = false
+                        }
+                        .disabled(comment.isEmpty)
+                    }
+                }
+            }
+            .presentationDetents([.medium])
         }
     }
 }
