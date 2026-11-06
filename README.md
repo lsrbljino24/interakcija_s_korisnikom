@@ -264,10 +264,10 @@ Također, koristeći _Section_, u svrhu jednostavnijeg praćenja, primjeri su po
 
 Na kraju, pokrenemo aplikaciju koja treba izgledati prema sljedećim slikama:
 
-| Početni ekran | Otvoreni ekran |
-|---|---|
-| ![Početni ekran](images/pocetni-ekran.png) | ![Ekran dijaloga](images/ekran-dijalozi.png) |
-
+<p align="center">
+<img src="images/pocetni-ekran.png" alt="Početni ekran" width="300"> 
+<img src="images/ekran-dijalozi.png" alt="Dijalog ekran" width="300"> 
+</p>
 
 Sad kada smo pripremili početnu aplikaciju, možemo krenuti s primjerima.
 
@@ -405,7 +405,9 @@ mora znati da nema internetske veze jer o tome ovisi što može dalje raditi.
 
 Kako bi testirali implementirani kod, navigiramo se s početnog ekrana u sekciju _Dijalozi_ nakon čega odaberemo opciju _Informativni alert_ što nam prikaže sami alert na kojemu odaberemo opciju _U redu_. Možemo primijetiti kako se u _Zadnju reakciju korisnika_ upiše _Korisnik je potvrdio informativni alert_
 
-<img src="images/alert-informativni.png" alt="Alert informativni" width="400">
+<p align="center">
+<img src="images/alert-informativni.png" alt="Alert informativni" width="300">
+</p>
 
 ### 1.3 Alert za potvrdu destruktivne radnje
 
@@ -444,7 +446,9 @@ Button("Potvrda brisanja") {
 - Poruka objašnjava posljedicu, što je razlog za prikaz alerta:
   radnja se ne može poništiti.
 
-<img src="images/alert-brisanje.png" alt="Alert za potvrdu brisanja" width="400">
+<p align="center">
+<img src="images/alert-brisanje.png" alt="Alert za potvrdu brisanja" width="300">
+</p>
 
 ### 1.4 Alert s unosom teksta
 
@@ -484,8 +488,9 @@ Button("Alert s unosom teksta") {
 - Prije otvaranja alerta polje se prazni, kako ne bi ostao tekst
   od prošlog unosa.
 
-
-<img src="images/alert-unos.png" alt="Alert s unosom" width="400">
+<p align="center">
+<img src="images/alert-unos.png" alt="Alert s unosom" width="300">
+</p>
 
 ### 1.5 Confirmation dialog (action sheet)
 
@@ -533,7 +538,9 @@ Section("Confirmation dialog") {
 - Primjer ima dva izbora uz odustajanje, što je unutar preporučenog
   broja izbora.
 
-<img src="images/confirmation-dialog.png" alt="Confirmation dialog" width="400">
+<p align="center">
+<img src="images/confirmation-dialog.png" alt="Confirmation dialog" width="300">
+</p>
 
 ### 1.6 Sheet
 
@@ -593,18 +600,262 @@ Section("Sheet") {
 - _.presentationDetents([.medium])_ prikazuje sheet preko pola ekrana,
   tako da korisnik i dalje vidi kontekst ispod njega.
 
-<img src="images/sheet.png" alt="Sheet" width="400">
+<p align="center">
+<img src="images/sheet.png" alt="Sheet" width="300">
+</p>
 
 ### Završni izgled ekrana
 
-| Ekran s primjerima | Alert | Confirmation dialog | Sheet |
+
+| Dijalozi ekran | Alert brisanje | Confirmation dialog | Sheet |
 |---|---|---|---|
 | ![](images/dijalozi-ekran.png) | ![](images/alert-brisanje.png) | ![](images/confirmation-dialog.png) | ![](images/sheet.png) |
+
 
 [↑ Natrag na sadržaj](#sadržaj)
 
 ## Korak 2: Toast
-...
+
+Toast je kratka poruka koja korisniku daje povratnu informaciju o radnji koji je upravo napravio, npr. "Poveznica je kopirana" ili "Spremljeno u favorite". Prikazuje se u malom okviru, zauzima samo onoliko mjesta koliko treba tekstu i nestaje nakon nekoliko sekundi.
+
+Za razliku od dijaloga, toast je **nemodalan**: ne prekida korisnika, ne traži nikakvu reakciju, a ostatak ekrana cijelo vrijeme ostaje vidljiv i upotrebljiv.
+
+Toast potječe iz Androida gdje postoji kao gotova komponenta. iOS nema takvu komponentu pa ga je potrebno implementirati kao vlastiti view.
+
+**Usporedba s ostalim načinima obavještavanja:**
+
+| | Toast | Snackbar | Alert | Notifikacija |
+|---|---|---|---|---|
+| Prekida korisnika | ne | ne | da | ne |
+| Nudi akciju | ne | da (jednu) | da | da |
+| Nestaje sam | da | da | ne | ne |
+| Radi kad aplikacija nije otvorena | ne | ne | ne | da |
+
+### Preporuke dizajna
+
+Apple Human Interface Guidelines ne opisuju toast, pa se preporuke
+temelje na Androidovoj dokumentaciji prilagođene iOS-u:
+
+- **Samo za kratku povratnu informaciju.** Toast potvrđuje da se
+  nešto dogodilo. Ne koristi ga za važne informacije, jer ga korisnik
+  lako može propustiti.
+- **Kratak tekst.** Najviše jedan do dva retka. Android od verzije 12
+  ograničava toast na dva retka.
+- **Bez akcija.** Ako korisnik treba moći reagirati (npr. poništiti
+  brisanje), koristi snackbar. Ako je informacija ključna, koristi alert.
+  Ako aplikacija nije otvorena, koristi notifikaciju.
+- **Ne zaklanjaj sadržaj.** Toast se prikazuje na dnu ekrana, iznad
+  sadržaja, i ne smije prekrivati važne kontrole.
+- **Jedan toast odjednom.** Nova poruka zamjenjuje prethodnu.
+- **Pristupačnost.** Korisnik koji koristi VoiceOver ne vidi toast,
+  pa se njegov tekst mora i izgovoriti.
+
+### Korak 2.1: Model poruke
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/1c4991e)
+
+U već napravljenoj mapi _Components_ napravi novu Swift datoteku _Toast.swift_  (označi mapu _Components_ → **+** u donjem lijevom kutu → **New File from Template…** → **Swift File**)
+
+Za početak napiši sljedeći kod:
+
+Toast.swift
+```swift
+import SwiftUI
+
+struct Toast: Equatable {
+    let id = UUID()
+    let message: String
+    var systemImage: String = "checkmark.circle.fill"
+}
+```
+- _message_ je tekst poruke, a _systemImage_ naziv ikone iz SF Symbols.
+  Ako se ikona ne navede, koristi se kvačica.
+- _id_ je jedinstvena oznaka svake poruke. Pomoću nje se dvije
+  poruke s istim tekstom smatraju različitima, pa se vrijeme prikaza
+  ponovno pokreće kad korisnik istu radnju napravi dvaput. Generira se pomoću _UUID_.
+- _Equatable_ omogućuje SwiftUI-ju da uspoređuje poruke i prepozna
+  kad se pojavila nova.
+
+### Korak 2.2 Izgled toasta
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/1f1363a)
+
+
+U istu datoteku, ispod structa _Toast_, dodaj view koji crta poruku:
+  
+```swift
+  
+struct ToastView: View {
+    let toast: Toast
+
+    var body: some View {
+        Label(toast.message, systemImage: toast.systemImage)
+            .font(.subheadline)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(.regularMaterial, in: Capsule())
+            .shadow(radius: 4, y: 2)
+    }
+}
+
+#Preview {
+    ToastView(toast: Toast(message: "Postavke su spremljene"))
+}
+
+```
+- _Label_ prikazuje ikonu i tekst jedno pokraj drugog.
+- _.font(.subheadline)_ koristi sistemski stil teksta, pa se veličina
+  automatski prilagođava postavci veličine teksta na uređaju.
+- _.regularMaterial_ je poluprozirna sistemska pozadina koja se sama
+  prilagođava svijetlom i tamnom načinu rada.
+- _Capsule()_ daje okvir zaobljenih rubova, a _.shadow_ blagu sjenu
+  koja odvaja toast od sadržaja ispod njega.
+- _#Preview_ nam daje uvid u izgled toasta s desne strane kako bi ga lakše dizajnirali
+
+<p align="center">
+  <img src="images/toast-preview.png" alt="Izgled toasta" width="300">
+  <br>
+  <span>Izgled toasta</span>
+</p>
+
+### Korak 2.3: Prikaz na ekranu
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/809f783)
+
+
+Toast se mora moći prikazati na bilo kojem ekranu. Zato se izrađuje
+kao **ViewModifier**. To je dodatak koji se može primijeniti na bilo koji view.
+
+U istu datoteku dodaj:
+```swift
+struct ToastModifier: ViewModifier {
+    @Binding var toast: Toast?
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(alignment: .bottom) {
+                if let toast {
+                    ToastView(toast: toast)
+                        .padding(.bottom, 32)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .animation(.easeInOut(duration: 0.3), value: toast)
+    }
+}
+
+extension View {
+    func toast(_ toast: Binding<Toast?>) -> some View {
+        modifier(ToastModifier(toast: toast))
+    }
+}
+```
+
+- _@Binding var toast: Toast?_ povezuje modifikator s varijablom na
+  ekranu. Kad je vrijednost _nil_, toast nije prikazan, a kad se postavi
+  poruka, toast se pojavi.
+- _.overlay(alignment: .bottom)_ crta toast **iznad** sadržaja ekrana,
+  pri dnu, bez pomicanja ostalih elemenata. Zato ekran ostaje
+  upotrebljiv dok je toast vidljiv.
+- _.transition_ određuje kako se toast pojavljuje i nestaje: ulazi
+  odozdo i istovremeno postaje vidljiv.
+- _.animation(..., value: toast)_ animira svaku promjenu poruke.
+- _extension View_ dodaje metodu _.toast(...)_, pa se toast na ekran
+  dodaje jednim retkom, isto kao _.alert_.
+
+### Korak 2.4: Automatski nestanak
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/f58b07d)
+
+
+Toast treba sam nestati nakon nekoliko sekundi. U _ToastModifier_
+dodaj modifikator _.task_ na _ToastView_, ispod _.transition_:
+
+```swift
+.task(id: toast) {
+        try? await Task.sleep(for: .seconds(2))
+        guard !Task.isCancelled else { return }
+        self.toast = nil
+```
+
+- _.task(id: toast)_ pokreće asinkroni zadatak kad se toast pojavi, a
+  ako se u međuvremenu pojavi nova poruka (drugi _id_), stari zadatak
+  se prekida i pokreće se novi, pa nova poruka dobiva pune dvije sekunde.
+- _Task.sleep_ čeka dvije sekunde bez blokiranja sučelja.
+- _guard !Task.isCancelled_ sprječava da prekinuti zadatak sakrije
+  novu poruku.
+- _self.toast = nil_ skriva toast, a animacija iz prethodnog koraka
+  se primjenjuje automatski.
+
+### Korak 2.5: Pristupačnost
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/0d74a0a)
+
+
+Korisnici VoiceOvera ne vide toast, pa ga sustav treba izgovoriti.
+
+Na početak bloka _.task: dodaj jedan redak:
+```swift
+ AccessibilityNotification.Announcement(toast.message).post()
+```
+_AccessibilityNotification.Announcement_ šalje tekst VoiceOveru, koji
+ga izgovori čim se toast pojavi. Korisnici bez VoiceOvera ne primjećuju
+nikakvu razliku.
+
+### Korak 2.6: Korištenje na ekranu
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/23388f8)
+
+
+Sada kad je komponenta gotova može se koristiti na ekranu _ToastScreen_. S obzirom da je kod datoteke _ToastScreen.swift_ vrlo sličan kao _DialogScreen.swift_, neće detaljnije objašnjavati. 
+Stoga zamijeni sadržaj datoteke _ToastScreen.switf_:
+
+```swift
+import SwiftUI
+
+struct ToastScreen: View {
+    @State private var toast: Toast?
+
+    var body: some View {
+        List {
+            Section {
+                Button("Kopiraj poveznicu") {
+                    toast = Toast(message: "Poveznica je kopirana")
+                }
+                Button("Dodaj u favorite") {
+                    toast = Toast(message: "Dodano u favorite")
+                }
+            } footer: {
+                Text("Toast se prikazuje na dnu ekrana i nestaje nakon dvije sekunde.")
+            }
+        }
+        .navigationTitle("Toast")
+        .toast($toast)
+    }
+}
+
+#Preview {
+    NavigationStack {
+        ToastScreen()
+    }
+}
+```
+
+- _@State private var toast: Toast?_ čuva trenutnu poruku. Na početku
+  je _nil_, pa toast nije prikazan.
+- Gumbi postavljaju novu poruku i time prikazuju toast.
+- _.toast($toast)_ je modifikator iz koraka 2.3. Sve ostalo (prikaz,
+  animacija, nestanak, izgovor) radi komponenta.
+
+Dakle vidimo koliko je jednostavno pozivati toast jednom kada je komponenta kreirana. Kako bi testirali, jednostavno kliknemo na jednu od opcija, npr. "Kopiraj poveznicu" nakon čega se prikazuje toast na dnu ekrana i nestaje nakon dvije sekunde. Ako ponovo odaberemo istu opciju, istek dvije sekunde krene od početka, a ako tijekom prikaza jednog toasta odaberemo opciju za prikaz drugog, prvi se zamijeni drugim.
+
+<p align="center">
+  <img src="images/toast-ekran.png" alt="Toast na ekranu" width="300">
+  <img src="images/toast-prikaz.png" alt="Prikaz toasta" width="300">
+</p>
+
+[↑ Natrag na sadržaj](#sadržaj)
+
 
 ## Korak 3: Snackbar
 ...
