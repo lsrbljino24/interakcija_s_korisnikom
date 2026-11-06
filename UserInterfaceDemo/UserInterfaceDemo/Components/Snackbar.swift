@@ -47,6 +47,7 @@ struct SnackbarView: View {
 
 struct SnackbarModifier: ViewModifier {
     @Binding var snackbar: Snackbar?
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     
     func  body(content: Content) -> some View {
         content
@@ -58,6 +59,13 @@ struct SnackbarModifier: ViewModifier {
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .task(id: snackbar){
+                        AccessibilityNotification.Announcement(snackbar.message).post()
+                        guard !voiceOverEnabled else { return }
+                        try? await Task.sleep(for: .seconds(4))
+                        guard !Task.isCancelled else { return }
+                        self.snackbar = nil
+                    }
                 }
             }
             .animation(.easeInOut(duration: 0.3),value: snackbar)
