@@ -856,10 +856,262 @@ Dakle vidimo koliko je jednostavno pozivati toast jednom kada je komponenta krei
 
 [↑ Natrag na sadržaj](#sadržaj)
 
-
 ## Korak 3: Snackbar
-...
 
+Snackbar je kratka poruka koja se prikazuje na dnu ekrana i obavještava korisnika o radnji koju je aplikacija napravila. Kao i toast, nemodalan je i nakon nekoliko sekundi sam nestaje. Razlika je u tome što snackbar može ponuditi **jednu akciju**, najčešće „Poništi“ ili „Pokušaj ponovno“.
+
+Snackbar potječe iz Material Designa, Googleovog sustava za dizajn. U iOS-u ne postoji kao gotova komponenta pa se implementira kao vlastiti view na sličan način kao toast u prethodnom koraku.
+
+U Koraku 1 navedena je preporuka da se alert ne prikazuje za česte radnje koje se mogu poništiti. Umjesto pitanja „Jeste li sigurni?“ prije brisanja, aplikacija može odmah obrisati stavku i ponuditi snackbar s gumbom „Poništi“. Korisnika se ne prekida, a pogreška se lako ispravlja.
+
+**Dijelovi snackbara:**
+1. **spremnik**: pozadina na dnu ekrana
+2. **tekst poruke**: jedan do dva retka
+3. **akcija** (neobavezno): jedan tekstualni gumb
+4. **gumb za zatvaranje** (neobavezno)
+
+### Preporuke dizajna
+
+Preporuke su preuzete iz Material Designa i Androidove dokumentacije,
+prilagođene iOS-u:
+
+- **Jedan snackbar odjednom.** Nova poruka zamjenjuje prethodnu,
+  snackbarovi se ne slažu jedan na drugi.
+- **Najviše jedna akcija.** Gumb za zatvaranje je neobavezan. Ako je
+  potrebno više izbora, koristi dijalog.
+- **Kratak tekst**, jedan do dva retka.
+- **Niski prioritet.** Snackbar ne prekida korisnika i ne traži
+  reakciju. Za važne informacije koristi alert.
+- **Ne zaklanjaj važne elemente.** Snackbar ne smije prekrivati
+  navigaciju ni FAB; ako na ekranu postoji FAB, snackbar se prikazuje
+  iznad njega. _(O FAB-u više riječi u koracima #4)_
+- **Razmak od rubova.** Snackbar drži stalnu udaljenost od lijevog,
+  desnog i donjeg ruba ekrana.
+- **Akcija ne smije biti jedini put do funkcije.** Ako korisnik
+  propusti snackbar, i dalje mora moći doći do iste funkcije.
+- **Pristupačnost.** Snackbar s akcijom ne bi smio nestati prije nego
+  ga korisnik čitača ekrana stigne pronaći. Zato se, kad je uključen
+  VoiceOver, ne skriva automatski.
+
+### 3.1 Model poruke
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/dcac302)
+
+U mapi _Components_ napravi novu Swift datoteku _Snackbar.swift_:
+```swift
+import SwiftUI
+
+struct Snackbar: Equatable {
+    let id = UUID()
+    let message: String
+    var actionTitle: String? = nil
+    var action: (() -> Void)? = nil
+
+    static func == (lhs: Snackbar, rhs: Snackbar) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+```
+- _message_ je tekst poruke.
+- _actionTitle_ i _action_ su naziv gumba i kod koji se izvršava kad
+  ga korisnik dodirne. Oba su neobavezna (_?_), pa snackbar može
+  postojati i bez akcije.
+- _action_ je **closure** (funkcija spremljena u varijablu). Swift ne
+  može sam usporediti dvije funkcije, pa se _Equatable_ ne može dobiti
+  automatski. Zato je usporedba (_==_) napisana ručno. Dakle dva snackbara su
+  jednaka ako imaju isti _id_.
+
+### 3.2 Izgled snackbara
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/9fbf360)
+
+U istu datoteku dodaj view:
+
+```swift
+struct SnackbarView: View {
+    let snackbar: Snackbar
+    let onDismiss: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(snackbar.message)
+                .font(.subheadline)
+                .foregroundStyle(Color(.systemBackground))
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            if let actionTitle = snackbar.actionTitle {
+                Button(actionTitle) {
+                    snackbar.action?()
+                    onDismiss()
+                }
+                .font(.subheadline.bold())
+            }
+
+            Button {
+                onDismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .foregroundStyle(Color(.systemBackground))
+            }
+            .accessibilityLabel("Zatvori")
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(.primary, in: RoundedRectangle(cornerRadius: 12))
+        .shadow(radius: 4, y: 2)
+    }
+}
+
+#Preview {
+    SnackbarView(
+        snackbar: Snackbar(message: "Poruka je obrisana", actionTitle: "Poništi"),
+        onDismiss: {}
+    )
+    .padding()
+}
+```
+
+- _onDismiss_ je funkcija koju view poziva kad se snackbar treba zatvoriti. Sam view ne zna kako se skriva, a to odlučuje modifikator u sljedećem koraku.
+- Pozadina je u obrnutim bojama od ekrana: _.primary_ je tamna u svijetlom načinu rada i svijetla u tamnom, a tekst je u boji pozadine ekrana (_systemBackground_). Tako se snackbar jasno ističe iznad sadržaja, kao što preporučuje Material Design.
+- Gumb akcije koristi naglasnu boju aplikacije i podebljani tekst kako bi se razlikovao od poruke.
+- Dodir na akciju prvo izvrši akciju (_snackbar.action?()_), a zatim zatvori snackbar. Upitnik znači: pozovi funkciju samo ako postoji.
+- _frame(maxWidth: .infinity)_ rasteže tekst, pa snackbar zauzima cijelu dostupnu širinu, a gumbi ostaju desno.
+- Gumb za zatvaranje prikazuje samo ikonu, pa mu _.accessibilityLabel_ daje naziv koji VoiceOver izgovara.
+
+<p align="center">
+  <img src="images/snackbar-preview.png" alt="Izgled snackbara" width="400">
+</p>
+
+### 3.3 Prikaz na ekranu
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/434d7b4)
+
+Kao i toast, snackbar se prikazuje pomoću modifikatora. U istu datoteku
+dodaj:
+
+```swift
+struct SnackbarModifier: ViewModifier {
+    @Binding var snackbar: Snackbar?
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(alignment: .bottom) {
+                if let snackbar {
+                    SnackbarView(snackbar: snackbar) {
+                        self.snackbar = nil
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .animation(.easeInOut(duration: 0.3), value: snackbar)
+    }
+}
+
+extension View {
+    func snackbar(_ snackbar: Binding<Snackbar?>) -> some View {
+        modifier(SnackbarModifier(snackbar: snackbar))
+    }
+}
+```
+Struktura je ista kao kod toasta. Jednie razlike su da _SnackbarView_ dobiva funkciju koja postavlja _snackbar_ na _nil_, pa ga zatvaraju gumb akcije i gumb za zatvaranje i da _padding(.horizontal, 16)_ drži razmak od rubova ekrana.
+
+### 3.4 Automatski nestanak i pristupačnost
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/14a1d63)
+
+
+Snackbar sam nestaje nakon četiri sekunde, dulje od toasta jer korisnik
+treba vremena da pročita poruku i odluči hoće li dodirnuti akciju. Ako je uključen VoiceOver, snackbar ostaje dok ga korisnik ne zatvori.
+
+U _SnackbarModifier_ dodaj varijablu okruženja na vrh structa:
+```swift
+@Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
+```
+Na _SnackbarView_, ispod _.transition_, dodaj:
+```swift
+.task(id: snackbar) {
+    AccessibilityNotification.Announcement(snackbar.message).post()
+    guard !voiceOverEnabled else { return }
+    try? await Task.sleep(for: .seconds(4))
+    guard !Task.isCancelled else { return }
+    self.snackbar = nil
+}
+```
+
+- _@Environment(\.accessibilityVoiceOverEnabled)_ čita sistemsku postavku koja govori je li na uređaju uključen VoiceOver.
+- _AccessibilityNotification.Announcement_ izgovara poruku, isto kao kod toasta.
+- _guard !voiceOverEnabled else { return }_ prekida zadatak prije odbrojavanja ako je VoiceOver uključen, pa snackbar ostaje vidljiv i korisnik može pronaći gumb akcije.
+- Ostatak je isti kao kod toasta. Dakle čeka se, a zatim se snackbar skriva osim ako ga je u međuvremenu zamijenila nova poruka.
+
+### 3.5 Korištenje na ekranu
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/4d9e011)
+
+Ekran prikazuje listu poruka. Kad korisnik obriše poruku, ona se odmah uklanja, a snackbar nudi poništavanje. 
+
+Zamijeni sadržaj datoteke _Screens/SnackbarScreen.swift_:
+```swift
+import SwiftUI
+
+struct SnackbarScreen: View {
+    @State private var messages = [
+        "Sastanak u 10 sati",
+        "Račun za studeni",
+        "Potvrda rezervacije",
+        "Pozivnica za rođendan",
+        "Novi komentar na objavu"
+    ]
+    @State private var snackbar: Snackbar?
+
+    var body: some View {
+        List {
+            Section {
+                ForEach(messages, id: \.self) { message in
+                    Label(message, systemImage: "envelope")
+                }
+                .onDelete(perform: deleteMessage)
+            } footer: {
+                Text("Povuci poruku ulijevo kako bi je obrisao.")
+            }
+        }
+        .navigationTitle("Snackbar")
+        .snackbar($snackbar)
+    }
+
+    private func deleteMessage(at offsets: IndexSet) {
+        guard let index = offsets.first else { return }
+        let deletedMessage = messages.remove(at: index)
+
+        snackbar = Snackbar(message: "Poruka je obrisana", actionTitle: "Poništi") {
+            withAnimation {
+                messages.insert(deletedMessage, at: index)
+            }
+        }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        SnackbarScreen()
+    }
+}
+```
+- _.onDelete_ omogućuje brisanje povlačenjem retka ulijevo i poziva funkciju _deleteMessage_ s indeksom obrisanog retka.
+- _deleteMessage_ uklanja poruku iz liste, ali je pamti (_deletedMessage_) zajedno s njezinim položajem (_index_).
+- Snackbar dobiva akciju „Poništi“. Njegov closure vraća poruku na isto mjesto u listi, a _withAnimation_ animira njezin povratak.
+- Brisanje se događa odmah bez potvrde (npr. alerta) jer se može poništiti.
+
+Sada možemo pokrenuti aplikaciju i povući poruku ulijevo i obrisati je. Pojavljuje se snackbar koji traje četiri sekunde na kojemu možemo odabrati opciju **Poništi** nakon čega se poruka vraća na svoje mjesto. S druge strane možemo pričekati četiri sekunde nakon čega snackbar nestaje.
+
+<p align="center">
+  <img src="images/snackbar-ekran.png" alt="Snackbar nakon brisanja poruke" width="300">
+</p>
+
+[↑ Natrag na sadržaj](#sadržaj)
+
+  
 ## Korak 4: FAB
 ...
 
