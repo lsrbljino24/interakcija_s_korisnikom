@@ -45,6 +45,31 @@ struct SnackbarView: View {
     }
 }
 
+struct SnackbarModifier: ViewModifier {
+    @Binding var snackbar: Snackbar?
+    
+    func  body(content: Content) -> some View {
+        content
+            .overlay(alignment: .bottom){
+                if let snackbar{
+                    SnackbarView(snackbar: snackbar){
+                        self.snackbar = nil
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .animation(.easeInOut(duration: 0.3),value: snackbar)
+    }
+}
+
+extension View{
+    func snackbar(_ snackbar: Binding<Snackbar?>) -> some View {
+        modifier(SnackbarModifier(snackbar: snackbar))
+    }
+}
+
 #Preview {
     SnackbarView(
         snackbar: Snackbar(message: "Poruka je obrisana", actionTitle: "Poništi"),
