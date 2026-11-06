@@ -29,6 +29,7 @@ struct ToastModifier: ViewModifier {
                     .padding(.bottom, 32)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .task(id: toast){
+                        AccessibilityNotification.Announcement(toast.message).post()
                         try? await Task.sleep(for: .seconds(2))
                         guard !Task.isCancelled else { return }
                         self.toast = nil
