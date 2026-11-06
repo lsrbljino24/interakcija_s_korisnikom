@@ -28,6 +28,11 @@ struct ToastModifier: ViewModifier {
                 ToastView(toast: toast)
                     .padding(.bottom, 32)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .task(id: toast){
+                        try? await Task.sleep(for: .seconds(2))
+                        guard !Task.isCancelled else { return }
+                        self.toast = nil
+                    }
             }
         }
         .animation(.easeInOut(duration: 0.3), value: toast)
