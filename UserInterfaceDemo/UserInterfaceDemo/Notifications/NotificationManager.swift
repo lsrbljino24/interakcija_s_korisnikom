@@ -11,6 +11,10 @@ final class NotificationManager: NSObject{
     
     private let center = UNUserNotificationCenter.current()
     
+    func setUp(){
+        center.delegate = self
+    }
+    
     func requestAutorization() async -> Bool{
         let granted = (try? await center.requestAuthorization(options: [.alert, .sound])) ?? false
         if !granted{
@@ -38,5 +42,31 @@ final class NotificationManager: NSObject{
             trigger: trigger
         )
         try? await center.add(request)
+    }
+}
+
+
+extension NotificationManager: UNUserNotificationCenterDelegate{
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions{
+        [.banner, .sound]
+    }
+    
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse
+    ) async{
+        await handleAction(response.actionIdentifier)
+    }
+    
+    private func handleAction(_ identifier: String){
+        switch identifier{
+            case UNNotificationDefaultActionIdentifier:
+                lastAction = "Korisnik je dodirnuo notifikaicju"
+        default:
+            break
+        }
     }
 }
