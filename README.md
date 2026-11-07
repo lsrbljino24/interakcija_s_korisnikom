@@ -2,6 +2,18 @@
 
 Ovaj tutorial uključuje teorijske i praktične aspekte interakcije aplikacije i korisnika, odnosno prikazuje kako iOS aplikacija može slati poruke korisniku i kako korisnik može reagirati na njih. Svaki koncept je prvo teorijski objašnjen s preporukama za dizajn, a zatim implementiran u SwiftUI-ju.
 
+<hr/>
+
+**Kolegij**: Razvoj aplikacija za mobilne i pametne uređaje
+
+**Nositelj**: Izv. prof. dr. sc. Zlatko Stapić
+
+**Suradnik**: univ. mag. inf. Dario Ljubas
+
+
+**Autor**: Luka Srbljinović
+
+
 ## Sadržaj
 1. [Uvod](#uvod)
 2. [Početni projekt](#početni-projekt)
