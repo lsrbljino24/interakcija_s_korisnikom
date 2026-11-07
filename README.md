@@ -1567,7 +1567,23 @@ Kako bi testirao, pokreni aplikaciju, pozovi složenu notifikaciju i povuci prem
 
 
 ## Zaključak
-...
+
+Aplikacija s korisnikom komunicira na više načina, a na nama je da odredimo kojoj situaciji ide koji način. Važno je uskladiti važnost poruke s razinom prekidanja korisnika. Dakle za važne odluke poželjan je dijalog, za kratke toast ili snackbar, a događaji izvan aplikacije traže sistemske notifikacije.
+
+Dijalozi i notifikacije su ugrađeni u iOS, dok su toast, snackbar i FAB preuzeti iz Material Designa i implementirani kao vlastite komponente. Pri njihovoj izradi važno je bilo pratiti preporuke dizajna i pristupačnosti.
+
+| Element | Prekida korisnika | Traži reakciju | Broj akcija | Nestaje sam | Radi izvan aplikacije | Gotova komponenta u iOS-u | Kada koristiti |
+|---|---|---|---|---|---|---|---|
+| Alert | da | da | do 3 | ne | ne | da | važna informacija ili potvrda nepovratne radnje |
+| Confirmation dialog | da | da | više izbora + odustani | ne | ne | da | izbor između više radnji koje je korisnik pokrenuo |
+| Sheet | djelomično | da | proizvoljno | ne | ne | da | kratak zadatak, npr. obrazac |
+| Toast | ne | ne | 0 | da | ne | ne | kratka potvrda radnje |
+| Snackbar | ne | ne | 1 | da | ne | ne | potvrda radnje uz mogućnost poništavanja |
+| FAB | ne | – | 1 | ne | ne | ne | glavna radnja ekrana |
+| Notifikacija | ne | ne | dodir + do više gumba | ne | da | da | događaj kad aplikacija nije otvorena |
+
+[↑ Natrag na sadržaj](#sadržaj)
+
 
 ## Literatura
 ...
