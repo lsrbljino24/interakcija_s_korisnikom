@@ -17,7 +17,7 @@ Ovaj tutorial uključuje teorijske i praktične aspekte interakcije aplikacije i
 ## Uvod
 
 Aplikacija stalno komunicira s korisnikom na različite načine:
-- potvrđuje da je neka uspjela
+- potvrđuje da je neka radnja uspjela
 - potvrđuje da nije uspjela odnosno javlja grešku
 - traži potvrdu za brisanje podataka
 - traži potvrdu za nastavak dalje u nekom koraku...
