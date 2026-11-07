@@ -13,6 +13,19 @@ final class NotificationManager: NSObject{
     
     func setUp(){
         center.delegate = self
+        
+        let accept = UNNotificationAction(identifier: "ACCEPT", title: "Prihvati", options:[])
+        let decline = UNNotificationAction(identifier: "DECLINE", title: "Odbij", options:[.destructive])
+        
+        let invitation = UNNotificationCategory(
+            identifier: "INVITATION",
+            actions: [accept, decline],
+            intentIdentifiers: [],
+            options: []
+        )
+        center.setNotificationCategories([invitation])
+        
+        
     }
     
     func requestAutorization() async -> Bool{
@@ -32,6 +45,24 @@ final class NotificationManager: NSObject{
         content.sound = .default
         
         await schedule(content)
+    }
+    
+    func sendRichNotification() async {
+        guard await requestAutorization() else { return }
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Pozivnica"
+        content.body = "Luka te poziva na seminar u ponedjeljak"
+        content.sound = .default
+        content.categoryIdentifier = "INVITATION"
+        
+        if let url = Bundle.main.url(forResource: "profile", withExtension: "jpg"),
+            let attachment = try? UNNotificationAttachment(identifier: "slika", url: url, options: nil){
+            content.attachments = [attachment]
+        }
+        await schedule(content)
+                
+        
     }
     
     private func schedule(_ content: UNNotificationContent) async {
