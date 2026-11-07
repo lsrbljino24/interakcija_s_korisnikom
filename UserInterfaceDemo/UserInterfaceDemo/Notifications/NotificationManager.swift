@@ -96,6 +96,10 @@ extension NotificationManager: UNUserNotificationCenterDelegate{
         switch identifier{
             case UNNotificationDefaultActionIdentifier:
                 lastAction = "Korisnik je dodirnuo notifikaicju"
+            case "ACCEPT":
+                lastAction = "Korisnik je prihvatio pozivnicu"
+            case "DECLINE":
+                lastAction = "Korisnik je odbijao pozivnicu"
         default:
             break
         }
