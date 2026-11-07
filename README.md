@@ -893,7 +893,7 @@ prilagođene iOS-u:
   ga korisnik čitača ekrana stigne pronaći. Zato se, kad je uključen
   VoiceOver, ne skriva automatski.
 
-### 3.1 Model poruke
+### Korak 3.1: Model poruke
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/dcac302)
 
@@ -921,7 +921,7 @@ struct Snackbar: Equatable {
   automatski. Zato je usporedba (_==_) napisana ručno. Dakle dva snackbara su
   jednaka ako imaju isti _id_.
 
-### 3.2 Izgled snackbara
+### Korak 3.2: Izgled snackbara
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/9fbf360)
 
@@ -982,7 +982,7 @@ struct SnackbarView: View {
   <img src="images/snackbar-preview.png" alt="Izgled snackbara" width="400">
 </p>
 
-### 3.3 Prikaz na ekranu
+### Korak 3.3: Prikaz na ekranu
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/434d7b4)
 
@@ -1017,7 +1017,7 @@ extension View {
 ```
 Struktura je ista kao kod toasta. Jednie razlike su da _SnackbarView_ dobiva funkciju koja postavlja _snackbar_ na _nil_, pa ga zatvaraju gumb akcije i gumb za zatvaranje i da _padding(.horizontal, 16)_ drži razmak od rubova ekrana.
 
-### 3.4 Automatski nestanak i pristupačnost
+### Korak 3.4: Automatski nestanak i pristupačnost
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/14a1d63)
 
@@ -1045,7 +1045,7 @@ Na _SnackbarView_, ispod _.transition_, dodaj:
 - _guard !voiceOverEnabled else { return }_ prekida zadatak prije odbrojavanja ako je VoiceOver uključen, pa snackbar ostaje vidljiv i korisnik može pronaći gumb akcije.
 - Ostatak je isti kao kod toasta. Dakle čeka se, a zatim se snackbar skriva osim ako ga je u međuvremenu zamijenila nova poruka.
 
-### 3.5 Korištenje na ekranu
+### Korak 3.5: Korištenje na ekranu
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/4d9e011)
 
@@ -1113,7 +1113,124 @@ Sada možemo pokrenuti aplikaciju i povući poruku ulijevo i obrisati je. Pojavl
 
   
 ## Korak 4: FAB
-...
+
+FAB (_Floating Action Button_, plutajući gumb za radnju) je okrugli gumb s ikonom koji „lebdi“ iznad sadržaja ekrana, najčešće u donjem desnom kutu. Predstavlja glavnu radnju ekrana, tj. onu koju korisnik najčešće izvodi, npr. novu poruku, novu bilješku ili novi kontakt.
+
+FAB ne prikazuje poruku korisniku za razliku od prethodnih elemenata nego je stalno dostupna točka iz koje korisnik pokreće neku interakciju. Zato se često kombinira s ostalim elementima, npr. FAB otvara dijalog ili obrazac, a rezultat radnje se potvrđuje toastom ili snackbarom.
+
+FAB postoji u dva oblika:
+- **standardni**: okrugli gumb sa samo ikonom
+- **prošireni**: gumb s ikonom i tekstom za slučajeve kad ikona sama nije dovoljno jasna
+
+FAB je dio Material Designa i iOS ga nema kao gotovu komponentu. Appleove aplikacije glavnu radnju obično stavljaju u navigacijsku ili alatnu traku. Međutim FAB se na iOS-u ipak koristi, posebno u aplikacijama koje dijele dizajn između Androida i iOS-a.
+
+### Preporuke dizajna
+
+Preporuke iz Material Designa:
+- **Samo za glavnu radnju.** FAB koristi samo ako ekran ima jednu
+  jasnu glavnu radnju. Ne treba ga svaki ekran.
+- **Jedan FAB po ekranu.** Više FAB-ova smanjuje njihovu istaknutost
+  i zbunjuje korisnika.
+- **Pozitivne radnje.** FAB služi za stvaranje, dodavanje ili dijeljenje,
+  a ne za brisanje ili sporedne radnje.
+- **Jasna ikona.** Ikona mora biti razumljiva sama po sebi (npr. `+` za
+  dodavanje). Ako nije, koristi prošireni FAB s tekstom.
+- **Veličina** standardnog FAB-a je 56 × 56.
+- **Snackbar iznad FAB-a.** Kad su oba prikazana, snackbar ne smije
+  prekriti FAB.
+
+Preporuke iz Apple Human Interface Guidelines:
+- **Područje dodira** gumba mora biti najmanje 44 × 44 pt. FAB od
+  56 pt to zadovoljava.
+- **Najviše jedan do dva istaknuta gumba po prikazu.** FAB je obojen
+  i istaknut, pa uz njega ne treba drugih istaknutih gumba.
+- **Pristupačnost.** Gumb sa samo ikonom mora imati tekstualni naziv
+  za VoiceOver.
+
+### Korak 4.1: Komponenta FAB
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/8bd0a48)
+
+U mapi _Components_ napravi novu Swift datoteku _FloatingActionButton.swift_:
+```swift
+import SwiftUI
+
+struct FloatingActionButton: View {
+    let title: String
+    let systemImage: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.title2.weight(.semibold))
+                .frame(width: 56, height: 56)
+                .foregroundStyle(.white)
+                .background(.tint, in: Circle())
+                .shadow(radius: 6, y: 3)
+        }
+        .accessibilityLabel(title)
+    }
+}
+
+#Preview {
+    FloatingActionButton(title: "Nova bilješka", systemImage: "plus") {}
+}
+```
+
+- _title_ je naziv radnje. Ne prikazuje se na gumbu, ali ga _.accessibilityLabel_ predaje VoiceOveru pa korisnik čuje
+  „Nova bilješka“ umjesto „plus“.
+- _systemImage_ je ikona iz SF Symbols, a _action_ kod koji se izvršava na dodir.
+- _.frame(width: 56, height: 56)_ daje FAB-u standardnu veličinu iz Material Designa.
+- _.background(.tint, in: Circle())_ crta krug u naglašenoj boji aplikacije.
+- _.shadow_ odvaja FAB od sadržaja i daje dojam da lebdi iznad njega.
+
+
+### Korak 4.2: FAB na ekranu
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/e8041ed)
+
+Na testnom ekranu prikazana je lista bilješki, a FAB dodaje novu. 
+Zamijeni sadržaj datoteke _FABScreen.swift_:
+```swift
+import SwiftUI
+
+struct FABScreen: View {
+    @State private var notes = ["Bilješka 1", "Bilješka 2", "Bilješka 3"]
+
+    var body: some View {
+        List(notes, id: \.self) { note in
+            Text(note)
+        }
+        .navigationTitle("FAB")
+        .safeAreaInset(edge: .bottom, alignment: .trailing) {
+            FloatingActionButton(title: "Nova bilješka", systemImage: "plus") {
+                withAnimation {
+                    notes.append("Bilješka \(notes.count + 1)")
+                }
+            }
+            .padding(16)
+        }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        FABScreen()
+    }
+}
+```
+- _.safeAreaInset(edge: .bottom, alignment: .trailing)_ postavlja FAB na dno ekrana uz desni rub i istovremeno povećava donji razmak liste za visinu FAB-a. Zato se zadnja bilješka može pomaknuti iznad FAB-a i ne ostaje skrivena ispod njega.
+- _withAnimation_ animira pojavljivanje nove bilješke na ekran.
+
+Kako bi testirao, pokreni aplikaciju i klikni na FAB odnosno na gumb _+_ čime se dodaje nova bilješka. Probaj dodati više bilješki u listu i pogledaj što će se sa FAB-om dogoditi.
+
+<p align="center">
+  <img src="images/fab-ekran.png" alt="FAB na ekranu" width="250">
+</p>
+
+[↑ Natrag na sadržaj](#sadržaj)
+
 
 ## Korak 5: Sistemske notifikacije
 ...
