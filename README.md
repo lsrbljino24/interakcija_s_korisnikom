@@ -1586,4 +1586,21 @@ Dijalozi i notifikacije su ugrađeni u iOS, dok su toast, snackbar i FAB preuzet
 
 
 ## Literatura
-...
+
+Android Developers. (bez dat.). *Toasts overview*. Pristupano 04.11.2026. na https://developer.android.com/guide/topics/ui/notifiers/toasts
+
+Apple Inc. (bez dat.-a). *Apple Developer Documentation* (SwiftUI, UserNotifications, Accessibility). Pristupano 04.11.2026. na https://developer.apple.com/documentation/
+
+Apple Inc. (bez dat.-b). *Human Interface Guidelines* (Alerts, Action sheets, Sheets, Feedback, Buttons, Notifications, Managing notifications). Preuzeto 05.11.2026. na https://developer.apple.com/design/human-interface-guidelines/
+
+Apple Inc. (bez dat.-c). *SF Symbols*. Pristupano 05.11.2026. na https://developer.apple.com/sf-symbols/
+
+Apple Inc. (bez dat.-d). *SwiftUI Tutorials*. Pristupano 05.11.2026. na https://developer.apple.com/tutorials/swiftui
+
+Google. (bez dat.). *Material Design 3* (Snackbars, Floating action button). Pristupano 06.11.2026. na https://m3.material.io/
+
+JetBrains. (bez dat.). *Snackbar*. Compose Multiplatform API reference. Pristupano 06.11.2026. na https://kotlinlang.org/api/compose-multiplatform/material3/androidx.compose.material3/-snackbar.html
+
+Swift.org. (bez dat.). *Swift documentation* (A Swift Tour, Swift API Design Guidelines). Pristupano 05.11.2026. na https://www.swift.org/documentation/
+
+[↑ Natrag na sadržaj](#sadržaj)
