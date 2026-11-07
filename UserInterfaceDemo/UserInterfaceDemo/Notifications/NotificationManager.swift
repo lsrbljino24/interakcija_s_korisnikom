@@ -18,4 +18,25 @@ final class NotificationManager: NSObject{
         }
         return granted
     }
+    
+    func sendSimpleNotification() async {
+        guard await requestAutorization() else { return }
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Podsjetnik"
+        content.body = "Vrijeme je za kratku pauzu."
+        content.sound = .default
+        
+        await schedule(content)
+    }
+    
+    private func schedule(_ content: UNNotificationContent) async {
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: trigger
+        )
+        try? await center.add(request)
+    }
 }
