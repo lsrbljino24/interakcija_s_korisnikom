@@ -1233,7 +1233,326 @@ Kako bi testirao, pokreni aplikaciju i klikni na FAB odnosno na gumb _+_ čime s
 
 
 ## Korak 5: Sistemske notifikacije
-...
+
+Sistemske notifikacije prikazuje operacijski sustav, a ne aplikacija. Zato mogu stići i kad aplikacija nije otvorena, npr. na zaključanom zaslonu, kao natpis na vrhu ekrana i u Centru za obavijesti.
+
+Postoje dvije vrste notifikacija:
+- **lokalne**: zakazuje ih sama aplikacija na uređaju 
+- **udaljene**: šalje ih poslužitelj preko Appleovog servisa
+
+U ovome tutorialu obrađujemo lokalne notifikacije, koje ne trebaju poslužitelj i rade u simulatoru.
+
+Za rad s notifikacijama koristi se framework **UserNotifications**.
+Glavni dijelovi su:
+
+| Dio | Uloga |
+|---|---|
+| _UNUserNotificationCenter_ | središnji objekt koji traži dozvolu, zakazuje notifikacije i prima reakcije |
+| _UNMutableNotificationContent_ | za naslov, tekst, zvuk, slika |
+| _UNTimeIntervalNotificationTrigger_ | služi kao okidač: kada se notifikacija prikazuje |
+| _UNNotificationRequest_ | to je zahtjev koji spaja sadržaj i okidač |
+| _UNUserNotificationCenterDelegate_ | prima reakcije korisnika na notifikacije |
+
+Korisnik na notifikaciju može reagirati na više načina:
+- **dodirom**: tada se može otvoriti aplikacija
+- **gumbom akcije**: tada se može izvesti neka radnja bez otvaranja aplikacije
+- **zatvaranjem**: notifikacija se odbacuje
+
+### Preporuke dizajna
+
+Preporuke su preuzete iz Apple Human Interface Guidelines:
+- **Dozvola je obavezna.** Prije slanja notifikacija aplikacija mora dobiti pristanak korisnika. Dobra praksa je tražiti ga u trenutku kad korisnik prvi put zatraži nešto što notifikacije treba, kako bi razumio zašto se traži.
+- **Kratko i informativno.** Notifikacija treba prenijeti vrijednu informaciju koja se razumije na prvi pogled.
+- **Bez ponavljanja.** Ne šalji više notifikacija za istu stvar.
+- **Ne za greške.** Poruku o grešci prikaži alertom unutar aplikacije.
+- **Obradi notifikacije dok je aplikacija otvorena.** Sustav ih tada po defaultu ne prikazuje, pa aplikacija mora odlučiti što s njima.
+- **Korisne akcije.** Gumbi na notifikaciji trebaju nuditi radnje koje korisniku štede vrijeme, npr. odgodu podsjetnika ili odgovor na pozivnicu.
+- **Zvuk** pomaže da korisnik primijeti notifikaciju kad ne gleda u ekran.
+
+### 5.1 Upravitelj notifikacija
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/8f9f534)
+
+Na početku tutoriala smo napravili mapu _Notifications_ u koju ćemo sada smjestiti klasu gdje će se nalaziti sav kod za notifikacije, jednostavne i složene.
+
+U mapi _Notifications_ kreiraj novu Swift datoteku _NotificationManager.swift_:
+```swift
+import UserNotifications
+import Observation
+
+@MainActor
+@Observable
+final class NotificationManager: NSObject {
+    static let shared = NotificationManager()
+
+    var lastAction = "Još nema reakcije na notifikaciju."
+
+    private let center = UNUserNotificationCenter.current()
+
+    func requestAuthorization() async -> Bool {
+        let granted = (try? await center.requestAuthorization(options: [.alert, .sound])) ?? false
+        if !granted {
+            lastAction = "Notifikacije nisu dopuštene. Uključi ih u Postavkama."
+        }
+        return granted
+    }
+}
+```
+- _@Observable_ omogućuje da se ekran automatski osvježi kad se promijeni _lastAction_, tj. zadnja reakcija korisnika.
+- _static let shared_ je jedna zajednička instanca koju koriste aplikacija i oba ekrana.
+- _NSObject_ je koristimo jer klasa kasnije postaje delegat notifikacijskog centra.
+- _requestAuthorization_ prikazuje sistemski upit za dozvolu. Upit se prikazuje samo prvi put, a kasnije metoda samo vraća korisnikovu odluku. _options_ određuje što aplikacija smije, u našem slučaju prikazivati notifikacije i puštati zvuk.
+
+### 5.2 Jednostavna notifikacija
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/804bb73)
+
+U _NotificationManager_ dodaj dvije metode:
+
+```swift
+func sendSimpleNotification() async {
+    guard await requestAuthorization() else { return }
+
+    let content = UNMutableNotificationContent()
+    content.title = "Podsjetnik"
+    content.body = "Vrijeme je za kratku pauzu."
+    content.sound = .default
+
+    await schedule(content)
+}
+
+private func schedule(_ content: UNNotificationContent) async {
+    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+    let request = UNNotificationRequest(
+        identifier: UUID().uuidString,
+        content: content,
+        trigger: trigger
+    )
+    try? await center.add(request)
+}
+```
+- Dozvola se traži tek kad korisnik prvi put pošalje notifikaciju u skladu s preporukom.
+- _content_ sadrži naslov, tekst i zadani zvuk.
+- Okidač prikazuje notifikaciju nakon 5 sekundi, samo jednom jer smo stavili _repeats: false_.
+- Svaki zahtjev ima jedinstveni _identifier_ pa nova notifikacija ne zamjenjuje prethodnu.
+- _schedule_ je zasebna metoda jer će je koristiti i složena notifikacija pa smo je izdvojili da se ne ponavlja.
+
+Zamijeni sadržaj _SimpleNotificationScreen.swift_:
+```swift
+import SwiftUI
+
+struct SimpleNotificationScreen: View {
+    private let manager = NotificationManager.shared
+
+    var body: some View {
+        List {
+            Section {
+                Button("Pošalji notifikaciju za 5 sekundi") {
+                    Task { await manager.sendSimpleNotification() }
+                }
+            } footer: {
+                Text("Nakon slanja možeš otići na početni zaslon (Cmd+Shift+H) i pričekati notifikaciju.")
+            }
+
+            Section("Zadnja reakcija korisnika") {
+                Text(manager.lastAction)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .navigationTitle("Jednostavna notifikacija")
+    }
+}
+```
+
+- _Task { }_ pokreće asinkroni kod iz gumba, jer gumb sam ne može čekati.
+
+Pokreni aplikaciju, dodirni gumb i dopusti notifikacije. Zatim idi na početni zaslon simulatora (**Cmd+Shift+H**) i pričekaj notifikaciju.
+
+<p align="center">
+  <img src="images/notifikacija-dozvola.png" alt="Upit za dozvolu" width="250">
+  <img src="images/notifikacija-jednostavna.png" alt="Jednostavna notifikacija" width="250">
+</p>
+
+### 5.3 Prikaz u aplikaciji i obrada dodira
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/4743408)
+
+Sada trebamo implementirati delegat notifikacijskog centra kako bi se notifikacija mogla prikazivati kad je aplikacija otvorena i kako bi aplikacija mogla znati kada korisnik dodirne notifikaciju.
+
+
+U _NotificationManager_ odmah ispod varijabli dodaj metodu koja klasu postavlja kao delegat:
+
+```swift
+func setUp() {
+    center.delegate = self
+}
+```
+Na dno datoteke ispod klase dodaj:
+```swift
+extension NotificationManager: UNUserNotificationCenterDelegate {
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        [.banner, .sound]
+    }
+
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse
+    ) async {
+        await handleAction(response.actionIdentifier)
+    }
+
+    private func handleAction(_ identifier: String) {
+        switch identifier {
+        case UNNotificationDefaultActionIdentifier:
+            lastAction = "Korisnik je dodirnuo notifikaciju."
+        default:
+            break
+        }
+    }
+}
+```
+- _willPresent_ se poziva kad notifikacija stigne dok je aplikacija otvorena. Vraćanjem _[.banner, .sound]_ notifikacija se prikazuje i tada.
+- _didReceive_ se poziva kad korisnik reagira na notifikaciju. _actionIdentifier_ govori što je korisnik napravio, a _UNNotificationDefaultActionIdentifier_ znači da je dodirnuo samu notifikaciju.
+- ove metode su označene s _nonisolated_ jer ih sustav poziva izvan glavne niti. _handleAction_ se poziva s _await_ jer mijenja _lastAction_ što se smije samo na glavnoj niti.
+
+Delegat mora biti postavljen čim se aplikacija pokrene pa u _UserInterfaceDemoApp.swift_ dodaj inicijalizator:
+
+```swift
+@main
+struct UserInterfaceDemoApp: App {
+    init() {
+        NotificationManager.shared.setUp()
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+```
+
+Kako bi testirao, pokreni aplikaciju, pošalji notifikaciju i ostani u aplikaciji. Pošalji notifikaciju idi na početni zaslon i dodirni je. Trebala bi se otvoriti aplikacija i na ekranu ispisati „Korisnik je dodirnuo notifikaciju.“
+
+
+### 5.4 Slika za složenu notifikaciju
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/8fb9a57)
+
+Složena notifikacija prikazuje sliku. Slika mora biti datoteka u projektu, a ne u katalogu _Assets_, jer sustav treba stvarnu putanju do datoteke, a slike iz kataloga je nemaju.
+
+Postavi sliku (npr. _profl.png_) u mapu _Notifications_ u Xcodeu. 
+
+### 5.5 Složena notifikacija: slika i gumbi
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/259157e)
+
+Gumbi na notifikaciji definiraju se unaprijed i grupiraju u kategoriju. Notifikacija zatim navodi svoju kategoriju, a sustav uz nju prikazuje gumbe te kategorije.
+
+Proširi _setUp_ registracijom kategorije s dva gumba:
+```swift
+func setUp() {
+    center.delegate = self
+
+    let accept = UNNotificationAction(identifier: "ACCEPT", title: "Prihvati", options: [])
+    let decline = UNNotificationAction(identifier: "DECLINE", title: "Odbij", options: [.destructive])
+
+    let invitation = UNNotificationCategory(
+        identifier: "INVITATION",
+        actions: [accept, decline],
+        intentIdentifiers: [],
+        options: []
+    )
+    center.setNotificationCategories([invitation])
+}
+```
+- _UNNotificationAction_ je jedan gumb. _identifier_ služi aplikaciji da prepozna koji je gumb dodirnut, a _title_ je tekst na gumbu.
+- _.destructive_ prikazuje gumb crveno isto kao uloga gumba u dijalozima.
+- _UNNotificationCategory_ grupira gumbe pod imenom _INVITATION_.
+
+Dodaj metodu za slanje složene notifikacije ispod _sendSimpleNotification_:
+```swift
+func sendRichNotification() async {
+    guard await requestAuthorization() else { return }
+
+    let content = UNMutableNotificationContent()
+    content.title = "Pozivnica"
+    content.body = "Ana te poziva na rođendansku proslavu u subotu."
+    content.sound = .default
+    content.categoryIdentifier = "INVITATION"
+
+    if let url = Bundle.main.url(forResource: "pozivnica", withExtension: "png"),
+       let attachment = try? UNNotificationAttachment(identifier: "slika", url: url, options: nil) {
+        content.attachments = [attachment]
+    }
+
+    await schedule(content)
+}
+```
+- _categoryIdentifier = "INVITATION"_ povezuje notifikaciju s kategorijom, pa se prikazuju gumbi „Prihvati“ i „Odbij“.
+- _Bundle.main.url_ pronalazi sliku u aplikaciji, a _UNNotificationAttachment_ je pretvara u privitak notifikacije.
+- Ako slika ne postoji notifikacija se šalje bez nje.
+
+### 5.6 Obrada akcija
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/6984fb4)
+
+Proširi _handleAction_ slučajevima za oba gumba:
+
+```swift
+private func handleAction(_ identifier: String) {
+    switch identifier {
+    case UNNotificationDefaultActionIdentifier:
+        lastAction = "Korisnik je dodirnuo notifikaciju."
+    case "ACCEPT":
+        lastAction = "Korisnik je prihvatio pozivnicu."
+    case "DECLINE":
+        lastAction = "Korisnik je odbio pozivnicu."
+    default:
+        break
+    }
+}
+```
+Zamijeni sadržaj _RichNotificationScreen.swift_:
+
+```swift
+import SwiftUI
+
+struct RichNotificationScreen: View {
+    private let manager = NotificationManager.shared
+
+    var body: some View {
+        List {
+            Section {
+                Button("Pošalji pozivnicu za 5 sekundi") {
+                    Task { await manager.sendRichNotification() }
+                }
+            } footer: {
+                Text("Dugo pritisni notifikaciju ili je povuci prema dolje za prikaz slike i gumba.")
+            }
+
+            Section("Zadnja reakcija korisnika") {
+                Text(manager.lastAction)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .navigationTitle("Složena notifikacija")
+    }
+}
+```
+
+Kako bi testirao, pokreni aplikaciju, pozovi složenu notifikaciju i povuci prema dolje kako bi prikazao veliku sliku notifikacije i gumbe "Prihvati" i "Odbij". Dodir na gumbe ne otvara aplikaciju nego postavi zadnju reakciju korisnika na ekranu.
+
+<p align="center">
+  <img src="images/notifikacija-slozena.png" alt="Složena notifikacija" width="250">
+  <img src="images/notifikacija-gumbi.png" alt="Gumbi na notifikaciji" width="250">
+</p>
+
+[↑ Natrag na sadržaj](#sadržaj)
+
 
 ## Zaključak
 ...
