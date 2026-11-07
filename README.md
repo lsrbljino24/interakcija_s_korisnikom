@@ -409,7 +409,7 @@ Kako bi testirali implementirani kod, navigiramo se s početnog ekrana u sekciju
 <img src="images/alert-informativni.png" alt="Alert informativni" width="300">
 </p>
 
-### 1.3 Alert za potvrdu destruktivne radnje
+### Korak 1.3 Alert za potvrdu destruktivne radnje
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/cfce10c)
 
@@ -450,7 +450,7 @@ Button("Potvrda brisanja") {
 <img src="images/alert-brisanje.png" alt="Alert za potvrdu brisanja" width="300">
 </p>
 
-### 1.4 Alert s unosom teksta
+### Korak 1.4 Alert s unosom teksta
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/906ee3a)
 
@@ -492,7 +492,7 @@ Button("Alert s unosom teksta") {
 <img src="images/alert-unos.png" alt="Alert s unosom" width="300">
 </p>
 
-### 1.5 Confirmation dialog (action sheet)
+### Korak 1.5 Confirmation dialog (action sheet)
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/e014252)
 
@@ -542,7 +542,7 @@ Section("Confirmation dialog") {
 <img src="images/confirmation-dialog.png" alt="Confirmation dialog" width="300">
 </p>
 
-### 1.6 Sheet
+### Korak 1.6 Sheet
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/a53d6a6)
 
@@ -1269,7 +1269,7 @@ Preporuke su preuzete iz Apple Human Interface Guidelines:
 - **Korisne akcije.** Gumbi na notifikaciji trebaju nuditi radnje koje korisniku štede vrijeme, npr. odgodu podsjetnika ili odgovor na pozivnicu.
 - **Zvuk** pomaže da korisnik primijeti notifikaciju kad ne gleda u ekran.
 
-### 5.1 Upravitelj notifikacija
+### Korak 5.1 Upravitelj notifikacija
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/8f9f534)
 
@@ -1303,7 +1303,7 @@ final class NotificationManager: NSObject {
 - _NSObject_ je koristimo jer klasa kasnije postaje delegat notifikacijskog centra.
 - _requestAuthorization_ prikazuje sistemski upit za dozvolu. Upit se prikazuje samo prvi put, a kasnije metoda samo vraća korisnikovu odluku. _options_ određuje što aplikacija smije, u našem slučaju prikazivati notifikacije i puštati zvuk.
 
-### 5.2 Jednostavna notifikacija
+### Korak 5.2 Jednostavna notifikacija
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/804bb73)
 
@@ -1373,7 +1373,7 @@ Pokreni aplikaciju, dodirni gumb i dopusti notifikacije. Zatim idi na početni z
   <img src="images/notifikacija-jednostavna.png" alt="Jednostavna notifikacija" width="250">
 </p>
 
-### 5.3 Prikaz u aplikaciji i obrada dodira
+### Korak 5.3 Prikaz u aplikaciji i obrada dodira
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/4743408)
 
@@ -1438,7 +1438,7 @@ struct UserInterfaceDemoApp: App {
 Kako bi testirao, pokreni aplikaciju, pošalji notifikaciju i ostani u aplikaciji. Pošalji notifikaciju idi na početni zaslon i dodirni je. Trebala bi se otvoriti aplikacija i na ekranu ispisati „Korisnik je dodirnuo notifikaciju.“
 
 
-### 5.4 Slika za složenu notifikaciju
+### Korak 5.4 Slika za složenu notifikaciju
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/8fb9a57)
 
@@ -1496,7 +1496,7 @@ func sendRichNotification() async {
 - _Bundle.main.url_ pronalazi sliku u aplikaciji, a _UNNotificationAttachment_ je pretvara u privitak notifikacije.
 - Ako slika ne postoji notifikacija se šalje bez nje.
 
-### 5.6 Obrada akcija
+### Korak 5.6 Obrada akcija
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/6984fb4)
 
