@@ -2,6 +2,18 @@
 
 Ovaj tutorial uključuje teorijske i praktične aspekte interakcije aplikacije i korisnika, odnosno prikazuje kako iOS aplikacija može slati poruke korisniku i kako korisnik može reagirati na njih. Svaki koncept je prvo teorijski objašnjen s preporukama za dizajn, a zatim implementiran u SwiftUI-ju.
 
+<hr/>
+
+**Kolegij**: Razvoj aplikacija za mobilne i pametne uređaje
+
+**Nositelj**: Izv. prof. dr. sc. Zlatko Stapić
+
+**Suradnik**: univ. mag. inf. Dario Ljubas
+
+
+**Autor**: Luka Srbljinović
+
+
 ## Sadržaj
 1. [Uvod](#uvod)
 2. [Početni projekt](#početni-projekt)
@@ -17,7 +29,7 @@ Ovaj tutorial uključuje teorijske i praktične aspekte interakcije aplikacije i
 ## Uvod
 
 Aplikacija stalno komunicira s korisnikom na različite načine:
-- potvrđuje da je neka uspjela
+- potvrđuje da je neka radnja uspjela
 - potvrđuje da nije uspjela odnosno javlja grešku
 - traži potvrdu za brisanje podataka
 - traži potvrdu za nastavak dalje u nekom koraku...
@@ -27,14 +39,10 @@ Važno je ispravno implementirati koncepte interakcije tako da manje važne poru
 Poruke korisniku možemo podijeliti u dvije skupine:
 
 **Poruke unutar aplikacije** prikazuju se dok korisnik koristi aplikaciju:
-- **Dijalozi**: prekidaju rad i traže odgovor korisnika
-  (npr. potvrda brisanja).
-- **Toast**: nemodalna poruka koja sama nestaje
-  (npr. „Spremljeno“).
-- **Snackbar**: sličan toastu, ali nudi i jednu akciju
-  (npr. „Poruka obrisana – Poništi“).
-- **FAB** (Floating Action Button) je istaknuti gumb za glavnu
-  radnju na ekranu.
+- **Dijalozi**: prekidaju rad i traže odgovor korisnika (npr. potvrda brisanja).
+- **Toast**: nemodalna poruka koja sama nestaje (npr. „Spremljeno“).
+- **Snackbar**: sličan toastu, ali nudi i jednu akciju (npr. „Poruka obrisana – Poništi“).
+- **FAB** (Floating Action Button) je istaknuti gumb za glavnu radnju na ekranu.
 
 **Sistemske notifikacije**: prikazuje operacijski sustav, pa stižu i kad aplikacija nije otvorena. U ovom tutorijalu obrađujemo lokalne notifikacije u dvije verzije: jednostavnu i složenu (o tome više riječi u koraku #5)
 
@@ -56,7 +64,7 @@ Kako bi mogli pratiti tutorial, potrebno je kreirati novi projekt:
 
 | Postavka | Vrijednost | Objašnjenje |
 |---|---|---|
-| Product Name | UserInteractionDemo (može biti proizvoljno) | ime aplikacije i projekta |
+| Product Name | UserInterfaceDemo (može biti proizvoljno) | ime aplikacije i projekta |
 | Interface | SwiftUI | framework za izradu sučelja |
 | Language | Swift | |
 | Storage | None | aplikacija ne sprema podatke |
@@ -125,7 +133,7 @@ Prije implementacije pojedinih koncepata potrebno je napraviti početni ekran s 
 
 ### 1. Mapa za ekrane
 
-Kako bi projekt ostao organiziran, s svi se ekrani spremaju u zajedničku mapu. U gornjem lijevom stupcu napravi klik na mapu _UserInterfaceDemo_ i odaberi **New Folder** te ga nazovi _Screens_. Također napravi i mape _Components_ i _Notifications_ koje ćemo koristiti kasnije za toast, snackbar i FAB kao komponente koje se mogu ponovo koristiti te za logiku notifikacija.
+Kako bi projekt ostao organiziran, svi se ekrani spremaju u zajedničku mapu. U gornjem lijevom stupcu napravi klik na mapu _UserInterfaceDemo_ i odaberi **New Folder** te je nazovi _Screens_. Također napravi i mape _Components_ i _Notifications_ koje ćemo koristiti kasnije za toast, snackbar i FAB kao komponente koje se mogu ponovo koristiti te za logiku notifikacija.
 
 ### 2. Prazni ekrani
 
@@ -280,7 +288,7 @@ Dijalog je **modalni** element sučelja koji se prikazuje iznad trenutnog sadrž
 U iOS-u postoje tri osnovna oblika dijaloga: 
 | Vrsta | Izgled | Kada se koristi | SwiftUi |
 |---|---|---|---|
-| **Alert** | mali okvir u sredini ekrana | važna informacija ili potvrda radnje | _.action_|
+| **Alert** | mali okvir u sredini ekrana | važna informacija ili potvrda radnje | _.alert_|
 | **Action sheet** (**Donfirmation Dialog**) | izbornik koji izlazi s dna ekrana | izbor između više radnji vezanih uz radnju koju je korisnik pokrenuo | _.confirmationDialog_ |
 | **Sheet** | ploča preko dijela ili cijelog ekrana | kratak, zaokružen zadatak vezan uz trenutni kontekst (npr. obrazac) | _.sheet_ |
 
@@ -290,47 +298,32 @@ Preporuke su preuzete iz Apple Human Interface Guidelines.
 _(Poveznica u sekciji [Literatura](#sadržaj) )_
 
 **Alert**
-- Koristi ga štedljivo. Alert prekida korisnika, pa svaki treba sadržavati
-  samo bitne informacije i korisne radnje. Ako se alerti pojavljuju
-  prečesto, korisnici ih počnu zatvarati bez čitanja.
-- Ne prikazuj alert za česte radnje koje se mogu poništiti, čak ni kad
-  su destruktivne. Primjer: brisanje e-maila ne traži potvrdu jer se
-  može vratiti iz smeća.
-- Alert ima naslov, neobavezni tekst poruke i najviše tri gumba.
-  Na iOS-u može sadržavati i polje za unos teksta.
-- Nazivi gumba trebaju biti kratki (jedna ili dvije riječi) i opisivati
-  rezultat: „Obriši“ je bolje od „Da“.
-- Ako korisnik bira između više od dva izbora, bolje je koristiti
-  action sheet.
+- Koristi ga štedljivo. Alert prekida korisnika, pa svaki treba sadržavati samo bitne informacije i korisne radnje. Ako se alerti pojavljuju prečesto, korisnici ih počnu zatvarati bez čitanja.
+- Ne prikazuj alert za česte radnje koje se mogu poništiti, čak ni kad su destruktivne. Primjer: brisanje e-maila ne traži potvrdu jer se može vratiti iz smeća.
+- Alert ima naslov, neobavezni tekst poruke i najviše tri gumba. Na iOS-u može sadržavati i polje za unos teksta.
+- Nazivi gumba trebaju biti kratki (jedna ili dvije riječi) i opisivati rezultat: „Obriši“ je bolje od „Da“.
+- Ako korisnik bira između više od dva izbora, bolje je koristiti action sheet.
 
 **Action Sheet** (**Confirmation Dialog**)
-- Koristi ga za izbore vezane uz radnju koju je korisnik sam pokrenuo.
-  Primjer: kad korisnik zatvara nedovršenu poruku, nudi se „Spremi skicu“
-  ili „Obriši skicu“.
-- Gumb za odustajanje nalazi se na dnu. U SwiftUI-ju ga confirmation
-  dialog dodaje automatski.
+- Koristi ga za izbore vezane uz radnju koju je korisnik sam pokrenuo. Primjer: kad korisnik zatvara nedovršenu poruku, nudi se „Spremi skicu“ ili „Obriši skicu“.
+- Gumb za odustajanje nalazi se na dnu. U SwiftUI-ju ga confirmation dialog dodaje automatski.
 - Uz gumb za odustajanje ponudi najviše tri dodatna izbora.
 
 **Sheet**
-- Koristi ga za kratak zadatak usko vezan uz trenutni kontekst,
-  npr. unos komentara ili uređivanje jednog podatka.
-- Sheet treba imati gumb za odustajanje koji ga zatvara bez spremanja
-  promjena.
+- Koristi ga za kratak zadatak usko vezan uz trenutni kontekst, npr. unos komentara ili uređivanje jednog podatka.
+- Sheet treba imati gumb za odustajanje koji ga zatvara bez spremanja promjena.
 
 **Uloge gumba**
 
 SwiftUI gumbima može dodijeliti ulogu (_role_):
-- _.destructive_ – gumb briše podatke ili izvodi nepovratnu radnju;
-  sustav ga prikazuje crveno
-- _.cancel_ – gumb zatvara dijalog bez ikakve radnje; sustav ga sam
-  postavlja na uobičajeno mjesto
+- _.destructive_ – gumb briše podatke ili izvodi nepovratnu radnju, a sustav ga prikazuje crveno
+- _.cancel_ – gumb zatvara dijalog bez ikakve radnje; sustav ga sam postavlja na uobičajeno mjesto
 
-Zahvaljujući ulogama, dijalozi automatski prate sistemski izgled
-i ponašanje, a korisnik odmah prepoznaje opasnu radnju.
+Zahvaljujući ulogama, dijalozi automatski prate sistemski izgled i ponašanje, a korisnik odmah prepoznaje opasnu radnju.
 
 ### Korak 1.1: Priprema ekrana
 
- 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/ecf5f0)
+ 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/ecf5fc0)
 
 Ekran _DialogsScreen_ prikazuje listu gumba, a svaki otvara jedan primjer dijaloga. Na dnu se prikazuje zadnja reakcija korisnika, kako bi se vidjelo koji je gumb u dijalogu odabran.
 
@@ -358,10 +351,8 @@ struct DialogsScreen: View {
 Svaki dijalog u SwiftUI-ju prikazuje se na isti način:
 1. varijabla stanja tipa _Bool_ određuje je li dijalog vidljiv
 2. gumb na ekranu postavlja tu varijablu na _true_
-3. modifikator dijaloga (_.alert_, _.confirmationDialog_, _.sheet_)
-   prima tu varijablu kao **binding** (_$_) i prikazuje dijalog
-4. kad korisnik odabere gumb u dijalogu, SwiftUI sam vraća varijablu
-   na _false_ i zatvara dijalog
+3. modifikator dijaloga (_.alert_, _.confirmationDialog_, _.sheet_) prima tu varijablu kao **binding** (_$_) i prikazuje dijalog
+4. kad korisnik odabere gumb u dijalogu, SwiftUI sam vraća varijablu na _false_ i zatvara dijalog
 
 U sljedeća tri koraka su objašnjena tri tipa Alerta.
 
@@ -369,8 +360,7 @@ U sljedeća tri koraka su objašnjena tri tipa Alerta.
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/48b9d4d)
 
-Najjednostavniji alert koji obavještava korisnika o važnom događaju
-i ima samo jedan gumb.
+Najjednostavniji alert koji obavještava korisnika o važnom događaju i ima samo jedan gumb.
 
 Dodaj varijablu stanja:
 ```swift
@@ -400,8 +390,7 @@ Dodaj modifikator nakon _.navigationTitle_:
 - _isPresented: $showInfoAlert_ povezuje alert s varijablom stanja.
 - U prvom bloku su **gumbi**, a u bloku _message_ **tekst poruke**.
 
-Primjer prati preporuku da alert sadrži važnu informaciju, dakle korisnik
-mora znati da nema internetske veze jer o tome ovisi što može dalje raditi.
+Primjer prati preporuku da alert sadrži važnu informaciju, dakle korisnik mora znati da nema internetske veze jer o tome ovisi što može dalje raditi.
 
 Kako bi testirali implementirani kod, navigiramo se s početnog ekrana u sekciju _Dijalozi_ nakon čega odaberemo opciju _Informativni alert_ što nam prikaže sami alert na kojemu odaberemo opciju _U redu_. Možemo primijetiti kako se u _Zadnju reakciju korisnika_ upiše _Korisnik je potvrdio informativni alert_
 
@@ -409,7 +398,7 @@ Kako bi testirali implementirani kod, navigiramo se s početnog ekrana u sekciju
 <img src="images/alert-informativni.png" alt="Alert informativni" width="300">
 </p>
 
-### 1.3 Alert za potvrdu destruktivne radnje
+### Korak 1.3: Alert za potvrdu destruktivne radnje
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/cfce10c)
 
@@ -439,23 +428,18 @@ Button("Potvrda brisanja") {
 ```
 
 - _role: .destructive_ prikazuje gumb crveno i upozorava korisnika.
-- _role: .cancel_ označava gumb za odustajanje. Sustav ga sam postavlja
-  na uobičajeno mjesto, bez obzira na redoslijed u kodu.
-- Gumbi su nazvani prema rezultatu („Obriši“, „Odustani“), a ne
-  „Da“ i „Ne“.
-- Poruka objašnjava posljedicu, što je razlog za prikaz alerta:
-  radnja se ne može poništiti.
+- _role: .cancel_ označava gumb za odustajanje. Sustav ga sam postavlja na uobičajeno mjesto, bez obzira na redoslijed u kodu.
+- Gumbi su nazvani prema rezultatu („Obriši“, „Odustani“), a ne „Da“ i „Ne“.
 
 <p align="center">
 <img src="images/alert-brisanje.png" alt="Alert za potvrdu brisanja" width="300">
 </p>
 
-### 1.4 Alert s unosom teksta
+### Korak 1.4: Alert s unosom teksta
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/906ee3a)
 
-Na iOS-u alert može sadržavati polje za unos teksta, što je korisno
-za kratak unos poput novog naziva.
+Na iOS-u alert može sadržavati polje za unos teksta, što je korisno za kratak unos poput novog naziva.
 
 ```swift
 @State private var showRenameAlert = false
@@ -485,20 +469,17 @@ Button("Alert s unosom teksta") {
 
 - _TextField_ unutar bloka gumba prikazuje polje za unos u alertu.
 - Tekst se sprema u varijablu _newName_ preko bindinga _$newName_.
-- Prije otvaranja alerta polje se prazni, kako ne bi ostao tekst
-  od prošlog unosa.
+- Prije otvaranja alerta polje se prazni, kako ne bi ostao tekst od prošlog unosa.
 
 <p align="center">
 <img src="images/alert-unos.png" alt="Alert s unosom" width="300">
 </p>
 
-### 1.5 Confirmation dialog (action sheet)
+### Korak 1.5: Confirmation dialog (action sheet)
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/e014252)
 
-Kada korisnik pokrene radnju koja ima više mogućih ishoda, koristi se
-confirmation dialog, koji se na iPhoneu prikazuje kao action sheet
-s dna ekrana.
+Kada korisnik pokrene radnju koja ima više mogućih ishoda, koristi se confirmation dialog, koji se na iPhoneu prikazuje kao action sheet s dna ekrana.
 
 ```swift
 @State private var showDraftDialog = false
@@ -531,18 +512,15 @@ Section("Confirmation dialog") {
     Text("Poruka još nije poslana.")
 }
 ```
-- Naslov se na iPhoneu po defaultu ne prikazuje, pa ga
-  _titleVisibility: .visible_ uključuje.
-- Gumb s ulogom _.cancel_ prikazuje se odvojeno na dnu. Kad bi se
-  izostavio, SwiftUI bi ga dodao automatski.
-- Primjer ima dva izbora uz odustajanje, što je unutar preporučenog
-  broja izbora.
+- Naslov se na iPhoneu po defaultu ne prikazuje, pa ga _titleVisibility: .visible_ uključuje.
+- Gumb s ulogom _.cancel_ prikazuje se odvojeno na dnu. Kad bi se izostavio, SwiftUI bi ga dodao automatski.
+- Primjer ima dva izbora uz odustajanje, što je unutar preporučenog broja izbora.
 
 <p align="center">
 <img src="images/confirmation-dialog.png" alt="Confirmation dialog" width="300">
 </p>
 
-### 1.6 Sheet
+### Korak 1.6: Sheet
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/a53d6a6)
 
@@ -591,14 +569,10 @@ Section("Sheet") {
 ```
 
 - Sadržaj sheeta je običan SwiftUI view, pa može sadržavati bilo što.
-- Za razliku od alerta, sheet se ne zatvara sam, nego ga zatvara
-  postavljanje _showSheet = false_.
-- _.cancellationAction_ i _.confirmationAction_ postavljaju gumbe na
-  uobičajena mjesta u navigacijskoj traci (lijevo odustajanje,
-  desno potvrda).
+- Za razliku od alerta, sheet se ne zatvara sam, nego ga zatvara postavljanje _showSheet = false_.
+- _.cancellationAction_ i _.confirmationAction_ postavljaju gumbe na uobičajena mjesta u navigacijskoj traci (lijevo odustajanje, desno potvrda).
 - _.disabled(comment.isEmpty)_ onemogućuje slanje praznog komentara.
-- _.presentationDetents([.medium])_ prikazuje sheet preko pola ekrana,
-  tako da korisnik i dalje vidi kontekst ispod njega.
+- _.presentationDetents([.medium])_ prikazuje sheet preko pola ekrana, tako da korisnik i dalje vidi kontekst ispod njega.
 
 <p align="center">
 <img src="images/sheet.png" alt="Sheet" width="300">
@@ -616,7 +590,7 @@ Section("Sheet") {
 
 ## Korak 2: Toast
 
-Toast je kratka poruka koja korisniku daje povratnu informaciju o radnji koji je upravo napravio, npr. "Poveznica je kopirana" ili "Spremljeno u favorite". Prikazuje se u malom okviru, zauzima samo onoliko mjesta koliko treba tekstu i nestaje nakon nekoliko sekundi.
+Toast je kratka poruka koja korisniku daje povratnu informaciju o radnji koju je upravo napravio, npr. "Poveznica je kopirana" ili "Spremljeno u favorite". Prikazuje se u malom okviru, zauzima samo onoliko mjesta koliko treba tekstu i nestaje nakon nekoliko sekundi.
 
 Za razliku od dijaloga, toast je **nemodalan**: ne prekida korisnika, ne traži nikakvu reakciju, a ostatak ekrana cijelo vrijeme ostaje vidljiv i upotrebljiv.
 
@@ -633,22 +607,14 @@ Toast potječe iz Androida gdje postoji kao gotova komponenta. iOS nema takvu ko
 
 ### Preporuke dizajna
 
-Apple Human Interface Guidelines ne opisuju toast, pa se preporuke
-temelje na Androidovoj dokumentaciji prilagođene iOS-u:
+Apple Human Interface Guidelines ne opisuju toast, pa se preporuke temelje na Androidovoj dokumentaciji prilagođene iOS-u:
 
-- **Samo za kratku povratnu informaciju.** Toast potvrđuje da se
-  nešto dogodilo. Ne koristi ga za važne informacije, jer ga korisnik
-  lako može propustiti.
-- **Kratak tekst.** Najviše jedan do dva retka. Android od verzije 12
-  ograničava toast na dva retka.
-- **Bez akcija.** Ako korisnik treba moći reagirati (npr. poništiti
-  brisanje), koristi snackbar. Ako je informacija ključna, koristi alert.
-  Ako aplikacija nije otvorena, koristi notifikaciju.
-- **Ne zaklanjaj sadržaj.** Toast se prikazuje na dnu ekrana, iznad
-  sadržaja, i ne smije prekrivati važne kontrole.
+- **Samo za kratku povratnu informaciju.** Toast potvrđuje da se nešto dogodilo. Ne koristi ga za važne informacije, jer ga korisnik lako može propustiti.
+- **Kratak tekst.** Najviše jedan do dva retka. Android od verzije 12 ograničava toast na dva retka.
+- **Bez akcija.** Ako korisnik treba moći reagirati (npr. poništiti brisanje), koristi snackbar. Ako je informacija ključna, koristi alert. Ako aplikacija nije otvorena, koristi notifikaciju.
+- **Ne zaklanjaj sadržaj.** Toast se prikazuje na dnu ekrana, iznad sadržaja, i ne smije prekrivati važne kontrole.
 - **Jedan toast odjednom.** Nova poruka zamjenjuje prethodnu.
-- **Pristupačnost.** Korisnik koji koristi VoiceOver ne vidi toast,
-  pa se njegov tekst mora i izgovoriti.
+- **Pristupačnost.** Korisnik koji koristi VoiceOver ne vidi toast pa se njegov tekst mora i izgovoriti.
 
 ### Korak 2.1: Model poruke
 
@@ -668,15 +634,11 @@ struct Toast: Equatable {
     var systemImage: String = "checkmark.circle.fill"
 }
 ```
-- _message_ je tekst poruke, a _systemImage_ naziv ikone iz SF Symbols.
-  Ako se ikona ne navede, koristi se kvačica.
-- _id_ je jedinstvena oznaka svake poruke. Pomoću nje se dvije
-  poruke s istim tekstom smatraju različitima, pa se vrijeme prikaza
-  ponovno pokreće kad korisnik istu radnju napravi dvaput. Generira se pomoću _UUID_.
-- _Equatable_ omogućuje SwiftUI-ju da uspoređuje poruke i prepozna
-  kad se pojavila nova.
+- _message_ je tekst poruke, a _systemImage_ naziv ikone iz SF Symbols. Ako se ikona ne navede, koristi se kvačica.
+- _id_ je jedinstvena oznaka svake poruke. Pomoću nje se dvije poruke s istim tekstom smatraju različitima, pa se vrijeme prikaza ponovno pokreće kad korisnik istu radnju napravi dvaput. Generira se pomoću _UUID_.
+- _Equatable_ omogućuje SwiftUI-ju da uspoređuje poruke i prepozna kad se pojavila nova.
 
-### Korak 2.2 Izgled toasta
+### Korak 2.2: Izgled toasta
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/1f1363a)
 
@@ -704,12 +666,9 @@ struct ToastView: View {
 
 ```
 - _Label_ prikazuje ikonu i tekst jedno pokraj drugog.
-- _.font(.subheadline)_ koristi sistemski stil teksta, pa se veličina
-  automatski prilagođava postavci veličine teksta na uređaju.
-- _.regularMaterial_ je poluprozirna sistemska pozadina koja se sama
-  prilagođava svijetlom i tamnom načinu rada.
-- _Capsule()_ daje okvir zaobljenih rubova, a _.shadow_ blagu sjenu
-  koja odvaja toast od sadržaja ispod njega.
+- _.font(.subheadline)_ koristi sistemski stil teksta, pa se veličina automatski prilagođava postavci veličine teksta na uređaju.
+- _.regularMaterial_ je poluprozirna sistemska pozadina koja se sama prilagođava svijetlom i tamnom načinu rada.
+- _Capsule()_ daje okvir zaobljenih rubova, a _.shadow_ blagu sjenu koja odvaja toast od sadržaja ispod njega.
 - _#Preview_ nam daje uvid u izgled toasta s desne strane kako bi ga lakše dizajnirali
 
 <p align="center">
@@ -723,8 +682,7 @@ struct ToastView: View {
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/809f783)
 
 
-Toast se mora moći prikazati na bilo kojem ekranu. Zato se izrađuje
-kao **ViewModifier**. To je dodatak koji se može primijeniti na bilo koji view.
+Toast se mora moći prikazati na bilo kojem ekranu. Zato se izrađuje kao **ViewModifier**. To je dodatak koji se može primijeniti na bilo koji view.
 
 U istu datoteku dodaj:
 ```swift
@@ -751,41 +709,31 @@ extension View {
 }
 ```
 
-- _@Binding var toast: Toast?_ povezuje modifikator s varijablom na
-  ekranu. Kad je vrijednost _nil_, toast nije prikazan, a kad se postavi
-  poruka, toast se pojavi.
-- _.overlay(alignment: .bottom)_ crta toast **iznad** sadržaja ekrana,
-  pri dnu, bez pomicanja ostalih elemenata. Zato ekran ostaje
-  upotrebljiv dok je toast vidljiv.
-- _.transition_ određuje kako se toast pojavljuje i nestaje: ulazi
-  odozdo i istovremeno postaje vidljiv.
+- _@Binding var toast: Toast?_ povezuje modifikator s varijablom na ekranu. Kad je vrijednost _nil_ toast nije prikazan, a kad se postavi poruka toast se pojavi.
+- _.overlay(alignment: .bottom)_ crta toast iznad sadržaja ekrana pri dnu bez pomicanja ostalih elemenata. Zato ekran ostaje upotrebljiv dok je toast vidljiv.
+- _.transition_ određuje kako se toast pojavljuje i nestaje.
 - _.animation(..., value: toast)_ animira svaku promjenu poruke.
-- _extension View_ dodaje metodu _.toast(...)_, pa se toast na ekran
-  dodaje jednim retkom, isto kao _.alert_.
+- _extension View_ dodaje metodu _.toast(...)_, pa se toast na ekran dodaje jednim retkom, isto kao _.alert_.
 
 ### Korak 2.4: Automatski nestanak
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/f58b07d)
 
 
-Toast treba sam nestati nakon nekoliko sekundi. U _ToastModifier_
-dodaj modifikator _.task_ na _ToastView_, ispod _.transition_:
+Toast treba sam nestati nakon nekoliko sekundi. U _ToastModifier_ dodaj modifikator _.task_ na _ToastView_, ispod _.transition_:
 
 ```swift
 .task(id: toast) {
         try? await Task.sleep(for: .seconds(2))
         guard !Task.isCancelled else { return }
         self.toast = nil
+}
 ```
 
-- _.task(id: toast)_ pokreće asinkroni zadatak kad se toast pojavi, a
-  ako se u međuvremenu pojavi nova poruka (drugi _id_), stari zadatak
-  se prekida i pokreće se novi, pa nova poruka dobiva pune dvije sekunde.
+- _.task(id: toast)_ pokreće asinkroni zadatak kad se toast pojavi, a ako se u međuvremenu pojavi nova poruka (drugi _id_), stari zadatak se prekida i pokreće se novi, pa nova poruka dobiva pune dvije sekunde.
 - _Task.sleep_ čeka dvije sekunde bez blokiranja sučelja.
-- _guard !Task.isCancelled_ sprječava da prekinuti zadatak sakrije
-  novu poruku.
-- _self.toast = nil_ skriva toast, a animacija iz prethodnog koraka
-  se primjenjuje automatski.
+- _guard !Task.isCancelled_ sprječava da prekinuti zadatak sakrije novu poruku.
+- _self.toast = nil_ skriva toast, a animacija iz prethodnog koraka se primjenjuje automatski.
 
 ### Korak 2.5: Pristupačnost
 
@@ -794,20 +742,18 @@ dodaj modifikator _.task_ na _ToastView_, ispod _.transition_:
 
 Korisnici VoiceOvera ne vide toast, pa ga sustav treba izgovoriti.
 
-Na početak bloka _.task: dodaj jedan redak:
+Na početak bloka _.task:_ dodaj jedan redak:
 ```swift
  AccessibilityNotification.Announcement(toast.message).post()
 ```
-_AccessibilityNotification.Announcement_ šalje tekst VoiceOveru, koji
-ga izgovori čim se toast pojavi. Korisnici bez VoiceOvera ne primjećuju
-nikakvu razliku.
+_AccessibilityNotification.Announcement_ šalje tekst VoiceOveru, koji ga izgovori čim se toast pojavi. Korisnici bez VoiceOvera ne primjećuju nikakvu razliku.
 
 ### Korak 2.6: Korištenje na ekranu
 
 🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/23388f8)
 
 
-Sada kad je komponenta gotova može se koristiti na ekranu _ToastScreen_. S obzirom da je kod datoteke _ToastScreen.swift_ vrlo sličan kao _DialogScreen.swift_, neće detaljnije objašnjavati. 
+Sada kad je komponenta gotova može se koristiti na ekranu _ToastScreen_. S obzirom da je kod datoteke _ToastScreen.swift_ vrlo sličan kao _DialogScreen.swift_, neće se detaljnije objašnjavati. 
 Stoga zamijeni sadržaj datoteke _ToastScreen.switf_:
 
 ```swift
@@ -841,11 +787,9 @@ struct ToastScreen: View {
 }
 ```
 
-- _@State private var toast: Toast?_ čuva trenutnu poruku. Na početku
-  je _nil_, pa toast nije prikazan.
+- _@State private var toast: Toast?_ čuva trenutnu poruku. Na početku je _nil_, pa toast nije prikazan.
 - Gumbi postavljaju novu poruku i time prikazuju toast.
-- _.toast($toast)_ je modifikator iz koraka 2.3. Sve ostalo (prikaz,
-  animacija, nestanak, izgovor) radi komponenta.
+- _.toast($toast)_ je modifikator iz koraka 2.3. Sve ostalo (prikaz, animacija, nestanak, izgovor) radi komponenta.
 
 Dakle vidimo koliko je jednostavno pozivati toast jednom kada je komponenta kreirana. Kako bi testirali, jednostavno kliknemo na jednu od opcija, npr. "Kopiraj poveznicu" nakon čega se prikazuje toast na dnu ekrana i nestaje nakon dvije sekunde. Ako ponovo odaberemo istu opciju, istek dvije sekunde krene od početka, a ako tijekom prikaza jednog toasta odaberemo opciju za prikaz drugog, prvi se zamijeni drugim.
 
@@ -875,23 +819,14 @@ U Koraku 1 navedena je preporuka da se alert ne prikazuje za česte radnje koje 
 Preporuke su preuzete iz Material Designa i Androidove dokumentacije,
 prilagođene iOS-u:
 
-- **Jedan snackbar odjednom.** Nova poruka zamjenjuje prethodnu,
-  snackbarovi se ne slažu jedan na drugi.
-- **Najviše jedna akcija.** Gumb za zatvaranje je neobavezan. Ako je
-  potrebno više izbora, koristi dijalog.
+- **Jedan snackbar odjednom.** Nova poruka zamjenjuje prethodnu, snackbarovi se ne slažu jedan na drugi.
+- **Najviše jedna akcija.** Gumb za zatvaranje je neobavezan. Ako je potrebno više izbora, koristi dijalog.
 - **Kratak tekst**, jedan do dva retka.
-- **Niski prioritet.** Snackbar ne prekida korisnika i ne traži
-  reakciju. Za važne informacije koristi alert.
-- **Ne zaklanjaj važne elemente.** Snackbar ne smije prekrivati
-  navigaciju ni FAB; ako na ekranu postoji FAB, snackbar se prikazuje
-  iznad njega. _(O FAB-u više riječi u koracima #4)_
-- **Razmak od rubova.** Snackbar drži stalnu udaljenost od lijevog,
-  desnog i donjeg ruba ekrana.
-- **Akcija ne smije biti jedini put do funkcije.** Ako korisnik
-  propusti snackbar, i dalje mora moći doći do iste funkcije.
-- **Pristupačnost.** Snackbar s akcijom ne bi smio nestati prije nego
-  ga korisnik čitača ekrana stigne pronaći. Zato se, kad je uključen
-  VoiceOver, ne skriva automatski.
+- **Niski prioritet.** Snackbar ne prekida korisnika i ne traži reakciju. Za važne informacije koristi alert.
+- **Ne zaklanjaj važne elemente.** Snackbar ne smije prekrivati navigaciju ni FAB; ako na ekranu postoji FAB, snackbar se prikazuje iznad njega. _(O FAB-u više riječi u Koraku #4)_
+- **Razmak od rubova.** Snackbar drži stalnu udaljenost od lijevog, desnog i donjeg ruba ekrana.
+- **Akcija ne smije biti jedini put do funkcije.** Ako korisnik propusti snackbar, i dalje mora moći doći do iste funkcije.
+- **Pristupačnost.** Snackbar s akcijom ne bi smio nestati prije nego ga korisnik čitača ekrana stigne pronaći. Zato se, kad je uključen VoiceOver, ne skriva automatski.
 
 ### Korak 3.1: Model poruke
 
@@ -913,13 +848,8 @@ struct Snackbar: Equatable {
 }
 ```
 - _message_ je tekst poruke.
-- _actionTitle_ i _action_ su naziv gumba i kod koji se izvršava kad
-  ga korisnik dodirne. Oba su neobavezna (_?_), pa snackbar može
-  postojati i bez akcije.
-- _action_ je **closure** (funkcija spremljena u varijablu). Swift ne
-  može sam usporediti dvije funkcije, pa se _Equatable_ ne može dobiti
-  automatski. Zato je usporedba (_==_) napisana ručno. Dakle dva snackbara su
-  jednaka ako imaju isti _id_.
+- _actionTitle_ i _action_ su naziv gumba i kod koji se izvršava kad ga korisnik dodirne. Oba su neobavezna (_?_), pa snackbar može postojati i bez akcije.
+- _action_ je **closure** (funkcija spremljena u varijablu). Swift ne može sam usporediti dvije funkcije, pa se _Equatable_ ne može dobiti automatski. Zato je usporedba (_==_) napisana ručno. Dakle dva snackbara su jednaka ako imaju isti _id_.
 
 ### Korak 3.2: Izgled snackbara
 
@@ -1127,25 +1057,17 @@ FAB je dio Material Designa i iOS ga nema kao gotovu komponentu. Appleove aplika
 ### Preporuke dizajna
 
 Preporuke iz Material Designa:
-- **Samo za glavnu radnju.** FAB koristi samo ako ekran ima jednu
-  jasnu glavnu radnju. Ne treba ga svaki ekran.
-- **Jedan FAB po ekranu.** Više FAB-ova smanjuje njihovu istaknutost
-  i zbunjuje korisnika.
-- **Pozitivne radnje.** FAB služi za stvaranje, dodavanje ili dijeljenje,
-  a ne za brisanje ili sporedne radnje.
-- **Jasna ikona.** Ikona mora biti razumljiva sama po sebi (npr. `+` za
-  dodavanje). Ako nije, koristi prošireni FAB s tekstom.
+- **Samo za glavnu radnju.** FAB koristi samo ako ekran ima jednu jasnu glavnu radnju. Ne treba ga svaki ekran.
+- **Jedan FAB po ekranu.** Više FAB-ova smanjuje njihovu istaknutost i zbunjuje korisnika.
+- **Pozitivne radnje.** FAB služi za stvaranje, dodavanje ili dijeljenje, a ne za brisanje ili sporedne radnje.
+- **Jasna ikona.** Ikona mora biti razumljiva sama po sebi (npr. `+` za dodavanje). Ako nije, koristi prošireni FAB s tekstom.
 - **Veličina** standardnog FAB-a je 56 × 56.
-- **Snackbar iznad FAB-a.** Kad su oba prikazana, snackbar ne smije
-  prekriti FAB.
+- **Snackbar iznad FAB-a.** Kad su oba prikazana, snackbar ne smije  prekriti FAB.
 
 Preporuke iz Apple Human Interface Guidelines:
-- **Područje dodira** gumba mora biti najmanje 44 × 44 pt. FAB od
-  56 pt to zadovoljava.
-- **Najviše jedan do dva istaknuta gumba po prikazu.** FAB je obojen
-  i istaknut, pa uz njega ne treba drugih istaknutih gumba.
-- **Pristupačnost.** Gumb sa samo ikonom mora imati tekstualni naziv
-  za VoiceOver.
+- **Područje dodira** gumba mora biti najmanje 44 × 44 pt. FAB od 56 pt to zadovoljava.
+- **Najviše jedan do dva istaknuta gumba po prikazu.** FAB je obojen i istaknut, pa uz njega ne treba drugih istaknutih gumba.
+- **Pristupačnost.** Gumb sa samo ikonom mora imati tekstualni naziv za VoiceOver.
 
 ### Korak 4.1: Komponenta FAB
 
@@ -1233,10 +1155,362 @@ Kako bi testirao, pokreni aplikaciju i klikni na FAB odnosno na gumb _+_ čime s
 
 
 ## Korak 5: Sistemske notifikacije
-...
+
+Sistemske notifikacije prikazuje operacijski sustav, a ne aplikacija. Zato mogu stići i kad aplikacija nije otvorena, npr. na zaključanom zaslonu, kao natpis na vrhu ekrana i u Centru za obavijesti.
+
+Postoje dvije vrste notifikacija:
+- **lokalne**: zakazuje ih sama aplikacija na uređaju 
+- **udaljene**: šalje ih poslužitelj preko Appleovog servisa
+
+U ovome tutorialu obrađujemo lokalne notifikacije, koje ne trebaju poslužitelj i rade u simulatoru.
+
+Za rad s notifikacijama koristi se framework **UserNotifications**.
+Glavni dijelovi su:
+
+| Dio | Uloga |
+|---|---|
+| _UNUserNotificationCenter_ | središnji objekt koji traži dozvolu, zakazuje notifikacije i prima reakcije |
+| _UNMutableNotificationContent_ | za naslov, tekst, zvuk, slika |
+| _UNTimeIntervalNotificationTrigger_ | služi kao okidač: kada se notifikacija prikazuje |
+| _UNNotificationRequest_ | to je zahtjev koji spaja sadržaj i okidač |
+| _UNUserNotificationCenterDelegate_ | prima reakcije korisnika na notifikacije |
+
+Korisnik na notifikaciju može reagirati na više načina:
+- **dodirom**: tada se može otvoriti aplikacija
+- **gumbom akcije**: tada se može izvesti neka radnja bez otvaranja aplikacije
+- **zatvaranjem**: notifikacija se odbacuje
+
+### Preporuke dizajna
+
+Preporuke su preuzete iz Apple Human Interface Guidelines:
+- **Dozvola je obavezna.** Prije slanja notifikacija aplikacija mora dobiti pristanak korisnika. Dobra praksa je tražiti ga u trenutku kad korisnik prvi put zatraži nešto što notifikacije treba, kako bi razumio zašto se traži.
+- **Kratko i informativno.** Notifikacija treba prenijeti vrijednu informaciju koja se razumije na prvi pogled.
+- **Bez ponavljanja.** Ne šalji više notifikacija za istu stvar.
+- **Ne za greške.** Poruku o grešci prikaži alertom unutar aplikacije.
+- **Obradi notifikacije dok je aplikacija otvorena.** Sustav ih tada po defaultu ne prikazuje, pa aplikacija mora odlučiti što s njima.
+- **Korisne akcije.** Gumbi na notifikaciji trebaju nuditi radnje koje korisniku štede vrijeme, npr. odgodu podsjetnika ili odgovor na pozivnicu.
+- **Zvuk** pomaže da korisnik primijeti notifikaciju kad ne gleda u ekran.
+
+### Korak 5.1: Upravitelj notifikacija
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/8f9f534)
+
+Na početku tutoriala smo napravili mapu _Notifications_ u koju ćemo sada smjestiti klasu gdje će se nalaziti sav kod za notifikacije, jednostavne i složene.
+
+U mapi _Notifications_ kreiraj novu Swift datoteku _NotificationManager.swift_:
+```swift
+import UserNotifications
+import Observation
+
+@MainActor
+@Observable
+final class NotificationManager: NSObject {
+    static let shared = NotificationManager()
+
+    var lastAction = "Još nema reakcije na notifikaciju."
+
+    private let center = UNUserNotificationCenter.current()
+
+    func requestAuthorization() async -> Bool {
+        let granted = (try? await center.requestAuthorization(options: [.alert, .sound])) ?? false
+        if !granted {
+            lastAction = "Notifikacije nisu dopuštene. Uključi ih u Postavkama."
+        }
+        return granted
+    }
+}
+```
+- _@Observable_ omogućuje da se ekran automatski osvježi kad se promijeni _lastAction_, tj. zadnja reakcija korisnika.
+- _static let shared_ je jedna zajednička instanca koju koriste aplikacija i oba ekrana.
+- _NSObject_ koristimo jer klasa kasnije postaje delegat notifikacijskog centra.
+- _requestAuthorization_ prikazuje sistemski upit za dozvolu. Upit se prikazuje samo prvi put, a kasnije metoda samo vraća korisnikovu odluku. _options_ određuje što aplikacija smije, u našem slučaju prikazivati notifikacije i puštati zvuk.
+
+### Korak 5.2: Jednostavna notifikacija
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/804bb73)
+
+U _NotificationManager_ dodaj dvije metode:
+
+```swift
+func sendSimpleNotification() async {
+    guard await requestAuthorization() else { return }
+
+    let content = UNMutableNotificationContent()
+    content.title = "Podsjetnik"
+    content.body = "Vrijeme je za kratku pauzu."
+    content.sound = .default
+
+    await schedule(content)
+}
+
+private func schedule(_ content: UNNotificationContent) async {
+    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+    let request = UNNotificationRequest(
+        identifier: UUID().uuidString,
+        content: content,
+        trigger: trigger
+    )
+    try? await center.add(request)
+}
+```
+- Dozvola se traži tek kad korisnik prvi put pošalje notifikaciju u skladu s preporukom.
+- _content_ sadrži naslov, tekst i zadani zvuk.
+- Okidač prikazuje notifikaciju nakon 5 sekundi, samo jednom jer smo stavili _repeats: false_.
+- Svaki zahtjev ima jedinstveni _identifier_ pa nova notifikacija ne zamjenjuje prethodnu.
+- _schedule_ je zasebna metoda jer će je koristiti i složena notifikacija pa smo je izdvojili da se ne ponavlja.
+
+Zamijeni sadržaj _SimpleNotificationScreen.swift_:
+```swift
+import SwiftUI
+
+struct SimpleNotificationScreen: View {
+    private let manager = NotificationManager.shared
+
+    var body: some View {
+        List {
+            Section {
+                Button("Pošalji notifikaciju za 5 sekundi") {
+                    Task { await manager.sendSimpleNotification() }
+                }
+            } footer: {
+                Text("Nakon slanja možeš otići na početni zaslon (Cmd+Shift+H) i pričekati notifikaciju.")
+            }
+
+            Section("Zadnja reakcija korisnika") {
+                Text(manager.lastAction)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .navigationTitle("Jednostavna notifikacija")
+    }
+}
+```
+
+- _Task { }_ pokreće asinkroni kod iz gumba, jer gumb sam ne može čekati.
+
+Pokreni aplikaciju, dodirni gumb i dopusti notifikacije. Zatim idi na početni zaslon simulatora (**Cmd+Shift+H**) i pričekaj notifikaciju.
+
+<p align="center">
+  <img src="images/notifikacija-dozvola.png" alt="Upit za dozvolu" width="250">
+  <img src="images/notifikacija-jednostavna.png" alt="Jednostavna notifikacija" width="250">
+</p>
+
+### Korak 5.3: Prikaz u aplikaciji i obrada dodira
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/4743408)
+
+Sada trebamo implementirati delegat notifikacijskog centra kako bi se notifikacija mogla prikazivati kad je aplikacija otvorena i kako bi aplikacija mogla znati kada korisnik dodirne notifikaciju.
+
+
+U _NotificationManager_ odmah ispod varijabli dodaj metodu koja klasu postavlja kao delegat:
+
+```swift
+func setUp() {
+    center.delegate = self
+}
+```
+Na dno datoteke ispod klase dodaj:
+```swift
+extension NotificationManager: UNUserNotificationCenterDelegate {
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        [.banner, .sound]
+    }
+
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse
+    ) async {
+        await handleAction(response.actionIdentifier)
+    }
+
+    private func handleAction(_ identifier: String) {
+        switch identifier {
+        case UNNotificationDefaultActionIdentifier:
+            lastAction = "Korisnik je dodirnuo notifikaciju."
+        default:
+            break
+        }
+    }
+}
+```
+- _willPresent_ se poziva kad notifikacija stigne dok je aplikacija otvorena. Vraćanjem _[.banner, .sound]_ notifikacija se prikazuje i tada.
+- _didReceive_ se poziva kad korisnik reagira na notifikaciju. _actionIdentifier_ govori što je korisnik napravio, a _UNNotificationDefaultActionIdentifier_ znači da je dodirnuo samu notifikaciju.
+- ove metode su označene s _nonisolated_ jer ih sustav poziva izvan glavne niti. _handleAction_ se poziva s _await_ jer mijenja _lastAction_ što se smije samo na glavnoj niti.
+
+Delegat mora biti postavljen čim se aplikacija pokrene pa u _UserInterfaceDemoApp.swift_ dodaj inicijalizator:
+
+```swift
+@main
+struct UserInterfaceDemoApp: App {
+    init() {
+        NotificationManager.shared.setUp()
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+```
+
+Kako bi testirao, pokreni aplikaciju, pošalji notifikaciju i ostani u aplikaciji. Pošalji notifikaciju idi na početni zaslon i dodirni je. Trebala bi se otvoriti aplikacija i na ekranu ispisati „Korisnik je dodirnuo notifikaciju.“
+
+
+### Korak 5.4: Slika za složenu notifikaciju
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/8fb9a57)
+
+Složena notifikacija prikazuje sliku. Slika mora biti datoteka u projektu, a ne u katalogu _Assets_, jer sustav treba stvarnu putanju do datoteke, a slike iz kataloga je nemaju.
+
+Postavi sliku (npr. _profl.png_) u mapu _Notifications_ u Xcodeu. 
+
+### Korak 5.5: Složena notifikacija: slika i gumbi
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/259157e)
+
+Gumbi na notifikaciji definiraju se unaprijed i grupiraju u kategoriju. Notifikacija zatim navodi svoju kategoriju, a sustav uz nju prikazuje gumbe te kategorije.
+
+Proširi _setUp_ registracijom kategorije s dva gumba:
+```swift
+func setUp() {
+    center.delegate = self
+
+    let accept = UNNotificationAction(identifier: "ACCEPT", title: "Prihvati", options: [])
+    let decline = UNNotificationAction(identifier: "DECLINE", title: "Odbij", options: [.destructive])
+
+    let invitation = UNNotificationCategory(
+        identifier: "INVITATION",
+        actions: [accept, decline],
+        intentIdentifiers: [],
+        options: []
+    )
+    center.setNotificationCategories([invitation])
+}
+```
+- _UNNotificationAction_ je jedan gumb. _identifier_ služi aplikaciji da prepozna koji je gumb dodirnut, a _title_ je tekst na gumbu.
+- _.destructive_ prikazuje gumb crveno isto kao uloga gumba u dijalozima.
+- _UNNotificationCategory_ grupira gumbe pod imenom _INVITATION_.
+
+Dodaj metodu za slanje složene notifikacije ispod _sendSimpleNotification_:
+```swift
+func sendRichNotification() async {
+    guard await requestAuthorization() else { return }
+
+    let content = UNMutableNotificationContent()
+    content.title = "Pozivnica"
+    content.body = "Ana te poziva na rođendansku proslavu u subotu."
+    content.sound = .default
+    content.categoryIdentifier = "INVITATION"
+
+    if let url = Bundle.main.url(forResource: "profil", withExtension: "png"),
+       let attachment = try? UNNotificationAttachment(identifier: "slika", url: url, options: nil) {
+        content.attachments = [attachment]
+    }
+
+    await schedule(content)
+}
+```
+- _categoryIdentifier = "INVITATION"_ povezuje notifikaciju s kategorijom, pa se prikazuju gumbi „Prihvati“ i „Odbij“.
+- _Bundle.main.url_ pronalazi sliku u aplikaciji, a _UNNotificationAttachment_ je pretvara u privitak notifikacije.
+- Ako slika ne postoji notifikacija se šalje bez nje.
+
+### Korak 5.6: Obrada akcija
+
+🔗 [Commit za ovaj korak](https://github.com/lsrbljino24/interakcija_s_korisnikom/commit/6984fb4)
+
+Proširi _handleAction_ slučajevima za oba gumba:
+
+```swift
+private func handleAction(_ identifier: String) {
+    switch identifier {
+    case UNNotificationDefaultActionIdentifier:
+        lastAction = "Korisnik je dodirnuo notifikaciju."
+    case "ACCEPT":
+        lastAction = "Korisnik je prihvatio pozivnicu."
+    case "DECLINE":
+        lastAction = "Korisnik je odbio pozivnicu."
+    default:
+        break
+    }
+}
+```
+Zamijeni sadržaj _RichNotificationScreen.swift_:
+
+```swift
+import SwiftUI
+
+struct RichNotificationScreen: View {
+    private let manager = NotificationManager.shared
+
+    var body: some View {
+        List {
+            Section {
+                Button("Pošalji pozivnicu za 5 sekundi") {
+                    Task { await manager.sendRichNotification() }
+                }
+            } footer: {
+                Text("Dugo pritisni notifikaciju ili je povuci prema dolje za prikaz slike i gumba.")
+            }
+
+            Section("Zadnja reakcija korisnika") {
+                Text(manager.lastAction)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .navigationTitle("Složena notifikacija")
+    }
+}
+```
+
+Kako bi testirao, pokreni aplikaciju, pozovi složenu notifikaciju i povuci prema dolje kako bi prikazao veliku sliku notifikacije i gumbe "Prihvati" i "Odbij". Dodir na gumbe ne otvara aplikaciju nego postavi zadnju reakciju korisnika na ekranu.
+
+<p align="center">
+  <img src="images/notifikacija-slozena.png" alt="Složena notifikacija" width="250">
+  <img src="images/notifikacija-gumbi.png" alt="Gumbi na notifikaciji" width="250">
+</p>
+
+[↑ Natrag na sadržaj](#sadržaj)
+
 
 ## Zaključak
-...
+
+Aplikacija s korisnikom komunicira na više načina, a na nama je da odredimo kojoj situaciji ide koji način. Važno je uskladiti važnost poruke s razinom prekidanja korisnika. Dakle za važne odluke poželjan je dijalog, za kratke toast ili snackbar, a događaji izvan aplikacije traže sistemske notifikacije.
+
+Dijalozi i notifikacije su ugrađeni u iOS, dok su toast, snackbar i FAB preuzeti iz Material Designa i implementirani kao vlastite komponente. Pri njihovoj izradi važno je bilo pratiti preporuke dizajna i pristupačnosti.
+
+| Element | Prekida korisnika | Traži reakciju | Broj akcija | Nestaje sam | Radi izvan aplikacije | Gotova komponenta u iOS-u | Kada koristiti |
+|---|---|---|---|---|---|---|---|
+| Alert | da | da | do 3 | ne | ne | da | važna informacija ili potvrda nepovratne radnje |
+| Confirmation dialog | da | da | više izbora + odustani | ne | ne | da | izbor između više radnji koje je korisnik pokrenuo |
+| Sheet | djelomično | da | proizvoljno | ne | ne | da | kratak zadatak, npr. obrazac |
+| Toast | ne | ne | 0 | da | ne | ne | kratka potvrda radnje |
+| Snackbar | ne | ne | 1 | da | ne | ne | potvrda radnje uz mogućnost poništavanja |
+| FAB | ne | – | 1 | ne | ne | ne | glavna radnja ekrana |
+| Notifikacija | ne | ne | dodir + do više gumba | ne | da | da | događaj kad aplikacija nije otvorena |
+
+[↑ Natrag na sadržaj](#sadržaj)
+
 
 ## Literatura
-...
+
+Android Developers. (bez dat.). *Toasts overview*. Pristupano 04.11.2026. na https://developer.android.com/guide/topics/ui/notifiers/toasts
+
+Apple Inc. (bez dat.-a). *Apple Developer Documentation* (SwiftUI, UserNotifications, Accessibility). Pristupano 04.11.2026. na https://developer.apple.com/documentation/
+
+Apple Inc. (bez dat.-b). *Human Interface Guidelines* (Alerts, Action sheets, Sheets, Feedback, Buttons, Notifications, Managing notifications). Pristupano 05.11.2026. na https://developer.apple.com/design/human-interface-guidelines/
+
+Apple Inc. (bez dat.-c). *SF Symbols*. Pristupano 05.11.2026. na https://developer.apple.com/sf-symbols/
+
+Apple Inc. (bez dat.-d). *SwiftUI Tutorials*. Pristupano 05.11.2026. na https://developer.apple.com/tutorials/swiftui
+
+Google. (bez dat.). *Material Design 3* (Snackbars, Floating action button). Pristupano 06.11.2026. na https://m3.material.io/
+
+JetBrains. (bez dat.). *Snackbar*. Compose Multiplatform API reference. Pristupano 06.11.2026. na https://kotlinlang.org/api/compose-multiplatform/material3/androidx.compose.material3/-snackbar.html
+
+Swift.org. (bez dat.). *Swift documentation* (A Swift Tour, Swift API Design Guidelines). Pristupano 05.11.2026. na https://www.swift.org/documentation/
+
+[↑ Natrag na sadržaj](#sadržaj)
