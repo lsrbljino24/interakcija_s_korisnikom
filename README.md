@@ -217,25 +217,25 @@ struct ContentView: View {
                     NavigationLink {
                         DialogsScreen()
                     } label: {
-                        Label("Dijalozi", systemImage: "exclamationmark.bubble")
+                        Text("Dijalozi")
                     }
 
                     NavigationLink {
                         ToastScreen()
                     } label: {
-                        Label("Toast", systemImage: "text.bubble")
+                        Text("Toast")
                     }
 
                     NavigationLink {
                         SnackbarScreen()
                     } label: {
-                        Label("Snackbar", systemImage: "square.bottomhalf.filled")
+                        Text("Snackbar")
                     }
 
                     NavigationLink {
                         FABScreen()
                     } label: {
-                        Label("FAB", systemImage: "plus.circle.fill")
+                        Text("FAB")
                     }
                 }
 
@@ -243,13 +243,13 @@ struct ContentView: View {
                     NavigationLink {
                         SimpleNotificationScreen()
                     } label: {
-                        Label("Jednostavna notifikacija", systemImage: "bell")
+                        Text("Jedostavna notifikacija")
                     }
 
                     NavigationLink {
                         RichNotificationScreen()
                     } label: {
-                        Label("Složena notifikacija", systemImage: "bell.badge")
+                        Text("Složena notifikacija")
                     }
                 }
             }
@@ -273,7 +273,7 @@ Također, koristeći _Section_, u svrhu jednostavnijeg praćenja, primjeri su po
 Na kraju, pokrenemo aplikaciju koja treba izgledati prema sljedećim slikama:
 
 <p align="center">
-<img src="images/pocetni-ekran.png" alt="Početni ekran" width="300"> 
+<img src="images/ekran-pocetni.png" alt="Početni ekran" width="300"> 
 <img src="images/ekran-dijalozi.png" alt="Dijalog ekran" width="300"> 
 </p>
 
