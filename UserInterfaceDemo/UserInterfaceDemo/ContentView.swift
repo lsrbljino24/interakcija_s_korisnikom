@@ -8,25 +8,25 @@ struct ContentView: View {
                     NavigationLink {
                         DialogsScreen()
                     } label: {
-                        Label("Dijalozi", systemImage: "exclamationmark.bubble")
+                        Text("Dijalozi")
                     }
 
                     NavigationLink {
                         ToastScreen()
                     } label: {
-                        Label("Toast", systemImage: "text.bubble")
+                        Text("Toast")
                     }
 
                     NavigationLink {
                         SnackbarScreen()
                     } label: {
-                        Label("Snackbar", systemImage: "square.bottomhalf.filled")
+                        Text("Snackbar")
                     }
 
                     NavigationLink {
                         FABScreen()
                     } label: {
-                        Label("FAB", systemImage: "plus.circle.fill")
+                        Text("FAB")
                     }
                 }
 
@@ -34,13 +34,13 @@ struct ContentView: View {
                     NavigationLink {
                         SimpleNotificationScreen()
                     } label: {
-                        Label("Jednostavna notifikacija", systemImage: "bell")
+                        Text("Jednostavna notifikacija")
                     }
 
                     NavigationLink {
                         RichNotificationScreen()
                     } label: {
-                        Label("Složena notifikacija", systemImage: "bell.badge")
+                        Text("Složena notifikacija")
                     }
                 }
             }

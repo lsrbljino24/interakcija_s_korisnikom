@@ -56,7 +56,7 @@ final class NotificationManager: NSObject{
         content.sound = .default
         content.categoryIdentifier = "INVITATION"
         
-        if let url = Bundle.main.url(forResource: "profile", withExtension: "jpg"),
+        if let url = Bundle.main.url(forResource: "profile", withExtension: "png"),
             let attachment = try? UNNotificationAttachment(identifier: "slika", url: url, options: nil){
             content.attachments = [attachment]
         }
